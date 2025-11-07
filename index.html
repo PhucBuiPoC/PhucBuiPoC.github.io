@@ -216,14 +216,13 @@
             }
         }
     </style>
-    <script src="oauth-config.js"></script>
 </head>
 
 <body>
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <h1>Customer Support Portal v.0.4</h1>
+            <h1>Customer Support Portal v.0.5</h1>
             <p>View and manage your company's support cases</p>
         </div>
 
@@ -323,38 +322,11 @@ Query: state=10 (Open cases)</pre>
     <!-- Login/Logout handlers -->
     <script>
         async function handleLogin() {
-            try {
-                console.log('Redirecting to ServiceNow OAuth...');
-
-                // Get authorization URL
-                const authUrl = window.oauthManager.getAuthorizationUrl();
-
-                // Redirect to ServiceNow for authentication
-                window.location.href = authUrl;
-
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Login failed: ' + error.message);
-            }
+            
         }
 
         async function handleLogout() {
-            try {
-                console.log('Attempting to logout...');
-
-                // Call ServiceNow logout function
-                if (window.servicenowLogout) {
-                    await window.servicenowLogout();
-                    console.log('Logout successful');
-                    window.updateAuthStatus(false, 'You have been logged out');
-                } else {
-                    console.error('Logout function not available');
-                    alert('Logout function not available. Please check ServiceNow configuration.');
-                }
-            } catch (error) {
-                console.error('Logout error:', error);
-                alert('Logout failed: ' + error.message);
-            }
+            
         }
 
         // Check browser compatibility
