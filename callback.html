@@ -64,7 +64,7 @@
                 console.log('Exchanging authorization code for tokens...');
                 await window.oauthManager.exchangeCodeForToken(code);
 
-                console.log('Authentication successful');
+                alert('Authentication successful');
 
                 // Redirect back to main page
                 window.location.href = '/index.html';
