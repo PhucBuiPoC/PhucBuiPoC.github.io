@@ -223,7 +223,7 @@
     <div class="container">
         <!-- Header Section -->
         <div class="header">
-            <h1>Customer Support Portal v.0.2</h1>
+            <h1>Customer Support Portal v.0.3</h1>
             <p>View and manage your company's support cases</p>
         </div>
 
@@ -295,87 +295,34 @@ Query: state=10 (Open cases)</pre>
         </div>
     </div>
 
-    
+
     <!-- ServiceNow Web Embeddables - Global Initialization -->
     <script type="module">
         import { init, login, logout, getEmbeddables } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
 
-        // Global variables for login/logout
-        window.servicenowLogin = login;
-        window.servicenowLogout = logout;
-
-        // Authentication callback function
+        // Authentication callback - return null để test
         function getTokenCallBack() {
-            try {
-                // Get ID token from OAuth manager
-                const idToken = window.oauthManager.getIdToken();
-
-                if (!idToken) {
-                    console.warn('No ID token available - user needs to login');
-                    return Promise.resolve(null);
-                }
-
-                console.log('ID token retrieved successfully');
-                return Promise.resolve(idToken);
-
-            } catch (error) {
-                console.error('Error getting ID token:', error);
-                return Promise.resolve(null);
-            }
+            console.log('getTokenCallBack called');
+            return Promise.resolve(null);
         }
 
-        // Initialize ServiceNow Web Embeddables
-        try {
-            await init({
-                theme: '31bf91ae07203010e03948f78ad30095',  // Theme sys_id
-                baseURL: 'https://sccitsmsit.service-now.com', // ServiceNow instance URL
-                authCallback: getTokenCallBack, // Authentication callback
-                module: '8f3596311bc57610f94cffb7d34bcbca', // PhucBuiPoC module
-                // Optional: Pre-cache components for improved performance
-                // cacheComponents: ["sn-embedx-case-list"]
-            });
+        // Initialize
+        await init({
+            theme: '31bf91ae07203010e03948f78ad30095',
+            baseURL: 'https://sccitsmsit.service-now.com',
+            authCallback: getTokenCallBack,
+            module: '8f3596311bc57610f94cffb7d34bcbca'
+        });
 
-            console.log('ServiceNow Web Embeddables initialized successfully');
+        console.log('Init success');
 
-            // Update status indicator
-            updateAuthStatus(false); // Not authenticated yet
+        // Load component
+        getEmbeddables(["sn-embedx-case-list"]);
 
-            // Load the case list component
-            getEmbeddables(["sn-embedx-case-list"]);
-
-        } catch (error) {
-            console.error('Error initializing ServiceNow Web Embeddables:', error);
-            updateAuthStatus(false, 'Error: ' + error.message);
-        }
-
-        // Update authentication status in UI
-        function updateAuthStatus(isAuthenticated, message = null) {
-            const statusIndicator = document.getElementById('statusIndicator');
-            const authStatus = document.getElementById('authStatus');
-            const authMessage = document.getElementById('authMessage');
-
-            if (isAuthenticated) {
-                statusIndicator.classList.remove('disconnected');
-                statusIndicator.classList.add('connected');
-                authStatus.textContent = 'Authentication Status: Connected';
-                authMessage.textContent = 'You are authenticated and can view your cases';
-                authMessage.style.color = '#48bb78';
-            } else {
-                statusIndicator.classList.remove('connected');
-                statusIndicator.classList.add('disconnected');
-                authStatus.textContent = 'Authentication Status: Not Connected';
-                authMessage.textContent = message || 'Please configure authentication to view your cases';
-                authMessage.style.color = '#f56565';
-            }
-        }
-
-        // Make updateAuthStatus available globally
-        window.updateAuthStatus = updateAuthStatus;
-
+        console.log('Component loaded');
     </script>
-
     <!-- Login/Logout handlers -->
-    <script type="module">
+    <script>
         async function handleLogin() {
             try {
                 console.log('Redirecting to ServiceNow OAuth...');
