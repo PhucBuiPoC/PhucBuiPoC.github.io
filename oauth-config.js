@@ -1,7 +1,7 @@
 // oauth-config.js
 const OAUTH_CONFIG = {
-    clientId: 'db19f71b444f4155a196a1d6453a7cd6',
-    clientSecret: ':I8)aJ1l#P', // Should be stored securely
+    clientId: '',
+    clientSecret: '', // Should be stored securely
     instanceUrl: 'https://sccitsmsit.service-now.com',
     redirectUri: 'https://phucbuipoc.github.io/callback',
     authorizationEndpoint: '/oauth_auth.do',
