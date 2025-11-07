@@ -291,6 +291,7 @@ Query: state=10 (Open cases)</pre>
                 <sn-embedx-case-list table="sn_customerservice_case" limit="10" list-title="List of Cases"
                     query="state=10" columns="number,short_description,sys_updated_on,state">
                 </sn-embedx-case-list>
+
             </div>
         </div>
     </div>
@@ -298,29 +299,27 @@ Query: state=10 (Open cases)</pre>
 
     <!-- ServiceNow Web Embeddables - Global Initialization -->
     <script type="module">
-        import { init, login, logout, getEmbeddables } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+        import { init, login, logout } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
 
-        // Authentication callback - return null để test
-        function getTokenCallBack() {
-            console.log('getTokenCallBack called');
-            return Promise.resolve(null);
-        }
-
-        // Initialize
         await init({
-            theme: '31bf91ae07203010e03948f78ad30095',
-            baseURL: 'https://sccitsmsit.service-now.com',
-            authCallback: getTokenCallBack,
-            module: '8f3596311bc57610f94cffb7d34bcbca'
+            theme: '31bf91ae07203010e03948f78ad30095',  /* sys_id of the theme to use for the embeddable components in your website*/
+            baseURL: 'https://sccitsmsit.service-now.com', /* Base URL of the instance to be used for the embeddable components in your website*/
+            authCallback: getTokenCallBack, /* Function which returns the auth token for the current user, required for auth setup*/
+            module: '8f3596311bc57610f94cffb7d34bcbca', /* PhucBuiPoC*/
+            // cacheComponents: ["sn-embedx-case-form","sn-embedx-case-list","sn-embedx-case-view","sn-embedx-catalog-item-form","903894c1b742301035a36161de11a992","sn-embedx-kb-article-view","sn-embedx-object-list"] /* Pre-caches resources for improved performance. Update component list as per your usage */
         });
-
-        console.log('Init success');
-
-        // Load component
-        getEmbeddables(["sn-embedx-case-list"]);
-
-        console.log('Component loaded');
+        function getTokenCallBack() {
+            var idToken; /* Get the id token for the current user */
+            return Promise.resolve(idToken);
+        }
     </script>
+
+    <script type="module">
+        import { getEmbeddables } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+
+        getEmbeddables(["sn-embedx-case-list"]);
+    </script>
+
     <!-- Login/Logout handlers -->
     <script>
         async function handleLogin() {
