@@ -69,6 +69,11 @@
             color: white;
         }
 
+        .btn-logout:hover {
+            background: #c0392b;
+        }
+
+        .btn-login:disabled,
         .btn-logout:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -212,11 +217,16 @@
         </div>
     </div>
 
-    <!-- Load ServiceNow Embeddables SDK First -->
-    <script src="https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx"></script>
+    <!-- CRITICAL: Load as ES6 module with type="module" -->
+    <script type="module">
+        // Dynamically import the ServiceNow SDK
+        const snModule = await import('https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx');
+        
+        console.log('✅ ServiceNow module loaded:', snModule);
+        
+        // Extract functions from the module
+        const { init, login, logout, getEmbeddables } = snModule;
 
-    <!-- Application Logic - NO type="module" needed -->
-    <script>
         // Configuration
         const CONFIG = {
             theme: '31bf91ae07203010e03948f78ad30095',
@@ -241,8 +251,6 @@
         function getTokenCallBack() {
             console.log('⚠️ getTokenCallBack called - Implement actual token retrieval here');
             // TODO: Replace with your actual token retrieval logic
-            // Example:
-            // return fetch('/api/auth/token').then(r => r.json()).then(d => d.token);
             const idToken = null;
             return Promise.resolve(idToken);
         }
@@ -279,17 +287,10 @@
         // Initialize ServiceNow Embeddables
         async function initializeEmbeddables() {
             try {
-                // Check if SN_EMBEDDABLES is available
-                if (typeof window.SN_EMBEDDABLES === 'undefined') {
-                    throw new Error('ServiceNow Embeddables SDK not loaded. Check if the script URL is correct.');
-                }
-
                 updateStatus('', 'Initializing ServiceNow...');
                 console.log('🚀 Starting initialization with config:', CONFIG);
-                console.log('✅ SN_EMBEDDABLES available:', window.SN_EMBEDDABLES);
                 
-                // Use the global API
-                await window.SN_EMBEDDABLES.init({
+                await init({
                     theme: CONFIG.theme,
                     baseURL: CONFIG.baseURL,
                     authCallback: getTokenCallBack,
@@ -307,7 +308,7 @@
                 
                 // Load the case list component
                 console.log('📦 Loading case list component...');
-                await window.SN_EMBEDDABLES.getEmbeddables(["sn-embedx-case-list"]);
+                await getEmbeddables(["sn-embedx-case-list"]);
                 
                 loadingIndicator.style.display = 'none';
                 caseListContainer.style.display = 'block';
@@ -340,7 +341,7 @@
                 updateStatus('', 'Authenticating...');
                 console.log('🔐 Attempting login...');
 
-                await window.SN_EMBEDDABLES.login();
+                await login();
                 
                 isLoggedIn = true;
                 loginBtn.textContent = 'Logged In';
@@ -370,7 +371,7 @@
                 updateStatus('', 'Logging out...');
                 console.log('🚪 Attempting logout...');
 
-                await window.SN_EMBEDDABLES.logout();
+                await logout();
                 
                 isLoggedIn = false;
                 loginBtn.disabled = false;
@@ -393,15 +394,11 @@
         loginBtn.addEventListener('click', handleLogin);
         logoutBtn.addEventListener('click', handleLogout);
 
-        // Listen for ServiceNow SDK Ready event
+        // Listen for ServiceNow events
         document.addEventListener('SN_EMBEDDABLES_READY', function() {
             console.log('✅ SN_EMBEDDABLES_READY event fired');
-            updateStatus('', 'SDK Ready - Initializing...');
-            // Start initialization after SDK is ready
-            initializeEmbeddables();
         });
 
-        // Session expired event
         document.addEventListener('SN_EMBEDDABLES_SESSION_EXPIRED', function() {
             console.log('⚠️ Session expired');
             showAlert('Your session has expired. Please login again.', 'warning');
@@ -412,25 +409,15 @@
             updateStatus('disconnected', 'Session expired');
         });
 
-        // Login success event
         document.addEventListener('SN_EMBEDDABLES_LOGIN_SUCCESS', function() {
             console.log('✅ Login success event');
         });
 
-        // Logout success event
         document.addEventListener('SN_EMBEDDABLES_LOGOUT_SUCCESS', function() {
             console.log('✅ Logout success event');
         });
 
-        // Check if SDK loaded immediately (in case event already fired)
-        if (typeof window.SN_EMBEDDABLES !== 'undefined') {
-            console.log('✅ SDK already loaded, initializing...');
-            initializeEmbeddables();
-        } else {
-            console.log('⏳ Waiting for SDK to load...');
-        }
-
-        // Debug helper
+        // Make functions globally available for debugging
         window.snApp = {
             login: handleLogin,
             logout: handleLogout,
@@ -438,12 +425,17 @@
             state: function() { 
                 return { 
                     isLoggedIn, 
-                    isInitialized,
-                    sdkLoaded: typeof window.SN_EMBEDDABLES !== 'undefined'
+                    isInitialized
                 }; 
             }
         };
+        
         console.log('🐛 Debug: window.snApp available');
+        console.log('🐛 Available functions:', Object.keys(window.snApp));
+
+        // Start initialization
+        console.log('🎬 Starting initialization...');
+        initializeEmbeddables();
     </script>
 </body>
 </html>
