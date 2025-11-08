@@ -167,6 +167,18 @@
             color: #856404;
             border: 1px solid #ffeaa7;
         }
+
+        .error-details {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #495057;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body>
@@ -205,8 +217,18 @@
         </div>
     </div>
 
+    <!-- Main Application Script - MUST be type="module" -->
     <script type="module">
-        import { init, login, logout, getEmbeddables } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+        // Import ServiceNow Embeddables functions
+        import { 
+            init, 
+            login, 
+            logout, 
+            getEmbeddables 
+        } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+
+        // Make functions globally available for debugging
+        window.snDebug = { init, login, logout, getEmbeddables };
 
         // Configuration
         const CONFIG = {
@@ -232,21 +254,35 @@
         function getTokenCallBack() {
             // TODO: Replace this with your actual token retrieval logic
             // For example, get token from your auth provider (Auth0, Okta, etc.)
+            // Example: return fetch('/api/auth/token').then(r => r.json()).then(d => d.token);
+            
+            console.log('getTokenCallBack called - please implement actual token retrieval');
             const idToken = null; // Get the id token for the current user
             return Promise.resolve(idToken);
         }
 
         // Show alert message
-        function showAlert(message, type = 'success') {
+        function showAlert(message, type = 'success', details = null) {
             const alert = document.createElement('div');
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
+            
+            if (details) {
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'error-details';
+                detailsDiv.textContent = details;
+                alert.appendChild(detailsDiv);
+            }
+            
             alertContainer.innerHTML = '';
             alertContainer.appendChild(alert);
             
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, 5000);
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                }, 5000);
+            }
         }
 
         // Update UI status
@@ -259,30 +295,41 @@
         async function initializeEmbeddables() {
             try {
                 updateStatus('', 'Initializing ServiceNow...');
+                console.log('Starting initialization with config:', CONFIG);
                 
                 await init({
                     theme: CONFIG.theme,
                     baseURL: CONFIG.baseURL,
                     authCallback: getTokenCallBack,
                     module: CONFIG.module,
-                    interceptSessionTimeout: true
+                    interceptSessionTimeout: true,
+                    // Pre-cache the component for better performance
+                    cacheComponents: ["sn-embedx-case-list"]
                 });
 
                 isInitialized = true;
                 updateStatus('connected', 'Connected to ServiceNow');
+                console.log('Initialization successful');
                 
                 // Load the case list component
+                console.log('Loading case list component...');
                 await getEmbeddables(["sn-embedx-case-list"]);
                 
                 loadingIndicator.style.display = 'none';
                 caseListContainer.style.display = 'block';
                 
                 showAlert('ServiceNow components loaded successfully!', 'success');
+                console.log('Component loaded successfully');
+                
             } catch (error) {
                 console.error('Initialization error:', error);
                 updateStatus('disconnected', 'Connection failed');
-                showAlert(`Failed to initialize: ${error.message}`, 'error');
-                loadingIndicator.innerHTML = '<p style="color: #e74c3c;">Failed to load components. Please refresh the page.</p>';
+                showAlert(
+                    `Failed to initialize ServiceNow components`, 
+                    'error',
+                    `Error: ${error.message}\n\nCheck browser console for more details.`
+                );
+                loadingIndicator.innerHTML = '<p style="color: #e74c3c;">Failed to load components. Please check the console and refresh the page.</p>';
             }
         }
 
@@ -297,20 +344,28 @@
                 loginBtn.disabled = true;
                 loginBtn.textContent = 'Logging in...';
                 updateStatus('', 'Authenticating...');
+                console.log('Attempting login...');
 
                 await login();
                 
                 isLoggedIn = true;
                 loginBtn.disabled = true;
                 logoutBtn.disabled = false;
+                loginBtn.textContent = 'Login';
                 updateStatus('connected', 'Logged in');
                 showAlert('Login successful!', 'success');
+                console.log('Login successful');
+                
             } catch (error) {
                 console.error('Login error:', error);
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Login';
                 updateStatus('disconnected', 'Login failed');
-                showAlert(`Login failed: ${error.message}`, 'error');
+                showAlert(
+                    `Login failed`, 
+                    'error',
+                    `Error: ${error.message}\n\nMake sure getTokenCallBack() returns a valid token.`
+                );
             }
         }
 
@@ -320,6 +375,7 @@
                 logoutBtn.disabled = true;
                 logoutBtn.textContent = 'Logging out...';
                 updateStatus('', 'Logging out...');
+                console.log('Attempting logout...');
 
                 await logout();
                 
@@ -329,6 +385,8 @@
                 logoutBtn.textContent = 'Logout';
                 updateStatus('connected', 'Logged out');
                 showAlert('Logout successful!', 'success');
+                console.log('Logout successful');
+                
             } catch (error) {
                 console.error('Logout error:', error);
                 logoutBtn.disabled = false;
@@ -343,11 +401,12 @@
 
         // Listen for ServiceNow events
         document.addEventListener('SN_EMBEDDABLES_READY', () => {
-            console.log('ServiceNow Embeddables are ready');
+            console.log('✅ SN_EMBEDDABLES_READY event fired');
+            showAlert('ServiceNow Embeddables are ready', 'success');
         });
 
         document.addEventListener('SN_EMBEDDABLES_SESSION_EXPIRED', () => {
-            console.log('Session expired');
+            console.log('⚠️ SN_EMBEDDABLES_SESSION_EXPIRED event fired');
             showAlert('Your session has expired. Please login again.', 'warning');
             isLoggedIn = false;
             loginBtn.disabled = false;
@@ -356,15 +415,25 @@
         });
 
         document.addEventListener('SN_EMBEDDABLES_LOGIN_SUCCESS', () => {
-            console.log('Login successful');
+            console.log('✅ SN_EMBEDDABLES_LOGIN_SUCCESS event fired');
         });
 
         document.addEventListener('SN_EMBEDDABLES_LOGOUT_SUCCESS', () => {
-            console.log('Logout successful');
+            console.log('✅ SN_EMBEDDABLES_LOGOUT_SUCCESS event fired');
         });
 
         // Initialize on page load
+        console.log('Page loaded, starting initialization...');
         initializeEmbeddables();
+
+        // Make functions available globally for debugging
+        window.snApp = {
+            login: handleLogin,
+            logout: handleLogout,
+            reinitialize: initializeEmbeddables,
+            state: () => ({ isLoggedIn, isInitialized })
+        };
+        console.log('Debug functions available: window.snApp and window.snDebug');
     </script>
 </body>
 </html>
