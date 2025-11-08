@@ -69,11 +69,6 @@
             color: white;
         }
 
-        .btn-logout:hover {
-            background: #c0392b;
-        }
-
-        .btn-login:disabled,
         .btn-logout:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -186,14 +181,14 @@
         <header>
             <h1>ServiceNow Case Management</h1>
             <div class="auth-controls">
-                <button id="loginBtn" class="btn-login">Login</button>
+                <button id="loginBtn" class="btn-login" disabled>Login</button>
                 <button id="logoutBtn" class="btn-logout" disabled>Logout</button>
             </div>
         </header>
 
         <div class="status-bar">
             <div class="status-indicator" id="statusIndicator"></div>
-            <span class="status-text" id="statusText">Initializing...</span>
+            <span class="status-text" id="statusText">Loading ServiceNow SDK...</span>
         </div>
 
         <div class="content">
@@ -217,19 +212,11 @@
         </div>
     </div>
 
-    <!-- Main Application Script - MUST be type="module" -->
-    <script type="module">
-        // Import ServiceNow Embeddables functions
-        import { 
-            init, 
-            login, 
-            logout, 
-            getEmbeddables 
-        } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+    <!-- Load ServiceNow Embeddables SDK First -->
+    <script src="https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx"></script>
 
-        // Make functions globally available for debugging
-        window.snDebug = { init, login, logout, getEmbeddables };
-
+    <!-- Application Logic - NO type="module" needed -->
+    <script>
         // Configuration
         const CONFIG = {
             theme: '31bf91ae07203010e03948f78ad30095',
@@ -252,12 +239,11 @@
 
         // Auth callback function
         function getTokenCallBack() {
-            // TODO: Replace this with your actual token retrieval logic
-            // For example, get token from your auth provider (Auth0, Okta, etc.)
-            // Example: return fetch('/api/auth/token').then(r => r.json()).then(d => d.token);
-            
-            console.log('getTokenCallBack called - please implement actual token retrieval');
-            const idToken = null; // Get the id token for the current user
+            console.log('⚠️ getTokenCallBack called - Implement actual token retrieval here');
+            // TODO: Replace with your actual token retrieval logic
+            // Example:
+            // return fetch('/api/auth/token').then(r => r.json()).then(d => d.token);
+            const idToken = null;
             return Promise.resolve(idToken);
         }
 
@@ -277,7 +263,6 @@
             alertContainer.innerHTML = '';
             alertContainer.appendChild(alert);
             
-            // Auto-hide success messages after 5 seconds
             if (type === 'success') {
                 setTimeout(() => {
                     alert.classList.remove('show');
@@ -294,42 +279,51 @@
         // Initialize ServiceNow Embeddables
         async function initializeEmbeddables() {
             try {
+                // Check if SN_EMBEDDABLES is available
+                if (typeof window.SN_EMBEDDABLES === 'undefined') {
+                    throw new Error('ServiceNow Embeddables SDK not loaded. Check if the script URL is correct.');
+                }
+
                 updateStatus('', 'Initializing ServiceNow...');
-                console.log('Starting initialization with config:', CONFIG);
+                console.log('🚀 Starting initialization with config:', CONFIG);
+                console.log('✅ SN_EMBEDDABLES available:', window.SN_EMBEDDABLES);
                 
-                await init({
+                // Use the global API
+                await window.SN_EMBEDDABLES.init({
                     theme: CONFIG.theme,
                     baseURL: CONFIG.baseURL,
                     authCallback: getTokenCallBack,
                     module: CONFIG.module,
                     interceptSessionTimeout: true,
-                    // Pre-cache the component for better performance
                     cacheComponents: ["sn-embedx-case-list"]
                 });
 
                 isInitialized = true;
                 updateStatus('connected', 'Connected to ServiceNow');
-                console.log('Initialization successful');
+                console.log('✅ Initialization successful');
+                
+                // Enable login button
+                loginBtn.disabled = false;
                 
                 // Load the case list component
-                console.log('Loading case list component...');
-                await getEmbeddables(["sn-embedx-case-list"]);
+                console.log('📦 Loading case list component...');
+                await window.SN_EMBEDDABLES.getEmbeddables(["sn-embedx-case-list"]);
                 
                 loadingIndicator.style.display = 'none';
                 caseListContainer.style.display = 'block';
                 
                 showAlert('ServiceNow components loaded successfully!', 'success');
-                console.log('Component loaded successfully');
+                console.log('✅ Component loaded successfully');
                 
             } catch (error) {
-                console.error('Initialization error:', error);
+                console.error('❌ Initialization error:', error);
                 updateStatus('disconnected', 'Connection failed');
                 showAlert(
-                    `Failed to initialize ServiceNow components`, 
+                    'Failed to initialize ServiceNow components', 
                     'error',
-                    `Error: ${error.message}\n\nCheck browser console for more details.`
+                    `Error: ${error.message}\n\nCheck browser console for details.`
                 );
-                loadingIndicator.innerHTML = '<p style="color: #e74c3c;">Failed to load components. Please check the console and refresh the page.</p>';
+                loadingIndicator.innerHTML = '<p style="color: #e74c3c;">❌ Failed to load. Check console and refresh.</p>';
             }
         }
 
@@ -344,27 +338,26 @@
                 loginBtn.disabled = true;
                 loginBtn.textContent = 'Logging in...';
                 updateStatus('', 'Authenticating...');
-                console.log('Attempting login...');
+                console.log('🔐 Attempting login...');
 
-                await login();
+                await window.SN_EMBEDDABLES.login();
                 
                 isLoggedIn = true;
-                loginBtn.disabled = true;
+                loginBtn.textContent = 'Logged In';
                 logoutBtn.disabled = false;
-                loginBtn.textContent = 'Login';
                 updateStatus('connected', 'Logged in');
                 showAlert('Login successful!', 'success');
-                console.log('Login successful');
+                console.log('✅ Login successful');
                 
             } catch (error) {
-                console.error('Login error:', error);
+                console.error('❌ Login error:', error);
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Login';
                 updateStatus('disconnected', 'Login failed');
                 showAlert(
-                    `Login failed`, 
+                    'Login failed', 
                     'error',
-                    `Error: ${error.message}\n\nMake sure getTokenCallBack() returns a valid token.`
+                    `${error.message}\n\nEnsure getTokenCallBack() returns a valid token.`
                 );
             }
         }
@@ -375,65 +368,82 @@
                 logoutBtn.disabled = true;
                 logoutBtn.textContent = 'Logging out...';
                 updateStatus('', 'Logging out...');
-                console.log('Attempting logout...');
+                console.log('🚪 Attempting logout...');
 
-                await logout();
+                await window.SN_EMBEDDABLES.logout();
                 
                 isLoggedIn = false;
                 loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
                 logoutBtn.disabled = true;
                 logoutBtn.textContent = 'Logout';
                 updateStatus('connected', 'Logged out');
                 showAlert('Logout successful!', 'success');
-                console.log('Logout successful');
+                console.log('✅ Logout successful');
                 
             } catch (error) {
-                console.error('Logout error:', error);
+                console.error('❌ Logout error:', error);
                 logoutBtn.disabled = false;
                 logoutBtn.textContent = 'Logout';
-                showAlert(`Logout failed: ${error.message}`, 'error');
+                showAlert('Logout failed: ' + error.message, 'error');
             }
         }
 
-        // Event listeners
+        // Event listeners for buttons
         loginBtn.addEventListener('click', handleLogin);
         logoutBtn.addEventListener('click', handleLogout);
 
-        // Listen for ServiceNow events
-        document.addEventListener('SN_EMBEDDABLES_READY', () => {
+        // Listen for ServiceNow SDK Ready event
+        document.addEventListener('SN_EMBEDDABLES_READY', function() {
             console.log('✅ SN_EMBEDDABLES_READY event fired');
-            showAlert('ServiceNow Embeddables are ready', 'success');
+            updateStatus('', 'SDK Ready - Initializing...');
+            // Start initialization after SDK is ready
+            initializeEmbeddables();
         });
 
-        document.addEventListener('SN_EMBEDDABLES_SESSION_EXPIRED', () => {
-            console.log('⚠️ SN_EMBEDDABLES_SESSION_EXPIRED event fired');
+        // Session expired event
+        document.addEventListener('SN_EMBEDDABLES_SESSION_EXPIRED', function() {
+            console.log('⚠️ Session expired');
             showAlert('Your session has expired. Please login again.', 'warning');
             isLoggedIn = false;
             loginBtn.disabled = false;
+            loginBtn.textContent = 'Login';
             logoutBtn.disabled = true;
             updateStatus('disconnected', 'Session expired');
         });
 
-        document.addEventListener('SN_EMBEDDABLES_LOGIN_SUCCESS', () => {
-            console.log('✅ SN_EMBEDDABLES_LOGIN_SUCCESS event fired');
+        // Login success event
+        document.addEventListener('SN_EMBEDDABLES_LOGIN_SUCCESS', function() {
+            console.log('✅ Login success event');
         });
 
-        document.addEventListener('SN_EMBEDDABLES_LOGOUT_SUCCESS', () => {
-            console.log('✅ SN_EMBEDDABLES_LOGOUT_SUCCESS event fired');
+        // Logout success event
+        document.addEventListener('SN_EMBEDDABLES_LOGOUT_SUCCESS', function() {
+            console.log('✅ Logout success event');
         });
 
-        // Initialize on page load
-        console.log('Page loaded, starting initialization...');
-        initializeEmbeddables();
+        // Check if SDK loaded immediately (in case event already fired)
+        if (typeof window.SN_EMBEDDABLES !== 'undefined') {
+            console.log('✅ SDK already loaded, initializing...');
+            initializeEmbeddables();
+        } else {
+            console.log('⏳ Waiting for SDK to load...');
+        }
 
-        // Make functions available globally for debugging
+        // Debug helper
         window.snApp = {
             login: handleLogin,
             logout: handleLogout,
             reinitialize: initializeEmbeddables,
-            state: () => ({ isLoggedIn, isInitialized })
+            state: function() { 
+                return { 
+                    isLoggedIn, 
+                    isInitialized,
+                    sdkLoaded: typeof window.SN_EMBEDDABLES !== 'undefined'
+                }; 
+            }
         };
-        console.log('Debug functions available: window.snApp and window.snDebug');
+        console.log('🐛 Debug: window.snApp available');
     </script>
 </body>
 </html>
