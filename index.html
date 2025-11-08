@@ -1,441 +1,694 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
+
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServiceNow Embeddables - Case List</title>
+
+    <title>Customer Portal - My Support Cases</title>
+
     <style>
         * {
+
             margin: 0;
+
             padding: 0;
+
             box-sizing: border-box;
+
         }
+
+
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f4f4f4;
+
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+            min-height: 100vh;
+
             padding: 20px;
+
         }
+
+
 
         .container {
-            max-width: 1200px;
+
+            max-width: 1400px;
+
             margin: 0 auto;
+
+        }
+
+
+
+        .header {
+
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+            margin-bottom: 30px;
+
         }
 
-        header {
-            background: #0f1b2b;
-            color: white;
-            padding: 20px 30px;
+
+
+        .header h1 {
+
+            color: #2d3748;
+
+            font-size: 32px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+
+        .header p {
+
+            color: #718096;
+
+            font-size: 16px;
+
+        }
+
+
+
+        .auth-section {
+
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+            margin-bottom: 30px;
+
+        }
+
+
+
+        .auth-buttons {
+
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+
+            gap: 15px;
+
+            margin-top: 15px;
+
         }
 
-        header h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
 
-        .auth-controls {
-            display: flex;
-            gap: 10px;
-        }
 
-        button {
-            padding: 10px 20px;
+        .btn {
+
+            padding: 12px 24px;
+
             border: none;
-            border-radius: 4px;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+
+            transition: all 0.3s;
+
         }
 
-        .btn-login {
-            background: #2ecc71;
+
+
+        .btn-primary {
+
+            background: #667eea;
+
             color: white;
+
         }
 
-        .btn-login:hover {
-            background: #27ae60;
+
+
+        .btn-primary:hover {
+
+            background: #5568d3;
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+
         }
 
-        .btn-logout {
-            background: #e74c3c;
-            color: white;
+
+
+        .btn-secondary {
+
+            background: #e2e8f0;
+
+            color: #2d3748;
+
         }
 
-        .btn-logout:hover {
-            background: #c0392b;
+
+
+        .btn-secondary:hover {
+
+            background: #cbd5e0;
+
         }
 
-        .btn-login:disabled,
-        .btn-logout:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
 
-        .status-bar {
-            background: #ecf0f1;
-            padding: 15px 30px;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
 
         .status-indicator {
+
+            display: inline-block;
+
             width: 10px;
+
             height: 10px;
+
             border-radius: 50%;
-            background: #95a5a6;
+
+            margin-right: 8px;
+
         }
+
+
 
         .status-indicator.connected {
-            background: #2ecc71;
-            animation: pulse 2s infinite;
+
+            background: #48bb78;
+
         }
+
+
 
         .status-indicator.disconnected {
-            background: #e74c3c;
+
+            background: #f56565;
+
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
 
-        .status-text {
-            color: #34495e;
-            font-size: 14px;
-        }
 
-        .content {
+        .card {
+
+            background: white;
+
             padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+            margin-bottom: 30px;
+
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-        }
 
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .card h2 {
 
-        .alert {
-            padding: 15px;
+            color: #2d3748;
+
+            font-size: 24px;
+
             margin-bottom: 20px;
-            border-radius: 4px;
-            display: none;
+
+            padding-bottom: 15px;
+
+            border-bottom: 2px solid #e2e8f0;
+
         }
 
-        .alert.show {
-            display: block;
+
+
+        .instructions {
+
+            background: #ebf4ff;
+
+            border-left: 4px solid #4299e1;
+
+            padding: 20px;
+
+            border-radius: 8px;
+
+            margin-bottom: 20px;
+
         }
 
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+
+        .instructions h3 {
+
+            color: #2c5282;
+
+            font-size: 18px;
+
+            margin-bottom: 10px;
+
         }
 
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+
+        .instructions ul {
+
+            color: #2c5282;
+
+            margin-left: 20px;
+
         }
 
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+
+
+        .instructions li {
+
+            margin-bottom: 8px;
+
+            line-height: 1.6;
+
         }
 
-        .error-details {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            color: #495057;
-            white-space: pre-wrap;
-            word-break: break-word;
+
+
+        .embed-container {
+
+            min-height: 400px;
+
+            background: #f7fafc;
+
+            border-radius: 8px;
+
+            padding: 20px;
+
+            margin-top: 20px;
+
+        }
+
+
+
+        .info-box {
+
+            background: #fff5f5;
+
+            border-left: 4px solid #f56565;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .info-box h4 {
+
+            color: #c53030;
+
+            font-size: 16px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+
+        .info-box p {
+
+            color: #742a2a;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+        }
+
+
+
+        .success-box {
+
+            background: #f0fff4;
+
+            border-left: 4px solid #48bb78;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .success-box h4 {
+
+            color: #2f855a;
+
+            font-size: 16px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+
+        .success-box p {
+
+            color: #22543d;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+        }
+
+
+
+        .code-block {
+
+            background: #2d3748;
+
+            color: #e2e8f0;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            overflow-x: auto;
+
+            font-family: 'Courier New', monospace;
+
+            font-size: 14px;
+
+            margin: 10px 0;
+
+        }
+
+
+
+        @media (max-width: 768px) {
+
+            .header {
+
+                padding: 20px;
+
+            }
+
+
+
+            .header h1 {
+
+                font-size: 24px;
+
+            }
+
+
+
+            .auth-buttons {
+
+                flex-direction: column;
+
+            }
+
         }
     </style>
+
 </head>
+
+
+
 <body>
+
     <div class="container">
-        <header>
-            <h1>ServiceNow Case Management</h1>
-            <div class="auth-controls">
-                <button id="loginBtn" class="btn-login" disabled>Login</button>
-                <button id="logoutBtn" class="btn-logout" disabled>Logout</button>
-            </div>
-        </header>
 
-        <div class="status-bar">
-            <div class="status-indicator" id="statusIndicator"></div>
-            <span class="status-text" id="statusText">Loading ServiceNow SDK...</span>
+        <!-- Header Section -->
+
+        <div class="header">
+
+            <h1>Customer Support Portal v.0.5</h1>
+
+            <p>View and manage your company's support cases</p>
+
         </div>
 
-        <div class="content">
-            <div id="alertContainer"></div>
-            
-            <div class="loading" id="loadingIndicator">
-                <div class="spinner"></div>
-                <p>Loading ServiceNow components...</p>
+
+
+        <!-- Authentication Section -->
+
+        <div class="auth-section">
+
+            <h2 style="margin-bottom: 15px;">
+
+                <span class="status-indicator disconnected" id="statusIndicator"></span>
+
+                <span id="authStatus">Authentication Status: Not Connected</span>
+
+            </h2>
+
+            <p style="color: #718096; margin-bottom: 15px;" id="authMessage">
+
+                Please configure authentication to view your cases
+
+            </p>
+
+            <div class="auth-buttons">
+
+                <button class="btn btn-primary" onclick="handleLogin()">
+
+                    Login to ServiceNow
+
+                </button>
+
+                <button class="btn btn-secondary" onclick="handleLogout()">
+
+                    Logout
+
+                </button>
+
             </div>
 
-            <!-- ServiceNow Case List Component -->
-            <div id="caseListContainer" style="display: none;">
-                <sn-embedx-case-list
-                    table="sn_customerservice_case"
-                    limit="10"
-                    list-title="List of Cases"
-                    query="state=10"
-                    columns="number,short_description,sys_updated_on,state">
+        </div>
+
+
+
+        <!-- Setup Instructions -->
+
+        <div class="card">
+
+            <h2>Configuration Status</h2>
+
+
+
+            <div class="success-box">
+
+
+                <h4>ServiceNow Configuration Detected</h4>
+
+
+                <p>Your ServiceNow instance is configured with the following:</p>
+
+                <ul style="margin-left: 20px; margin-top: 10px;">
+
+                    <li><strong>Instance:</strong> sccitsmsit.service-now.com</li>
+
+
+                    <li><strong>Module:</strong> PhucBuiPoC</li>
+
+                    <li><strong>Component:</strong> Demo List v1 (Case List)</li>
+
+                </ul>
+
+            </div>
+
+
+
+            <details style="margin-top: 20px;">
+
+                <summary
+                    style="cursor: pointer; padding: 10px; background: #edf2f7; border-radius: 8px; font-weight: 600;">
+
+                    View Current Configuration Code
+
+                </summary>
+
+                <div class="code-block" style="margin-top: 10px;">
+
+                    <pre>Instance: https://sccitsmsit.service-now.com
+
+Module ID: 8f3596311bc57610f94cffb7d34bcbca
+
+Theme ID: 31bf91ae07203010e03948f78ad30095
+
+Component: sn-embedx-case-list
+
+Table: sn_customerservice_case
+
+Query: state=10 (Open cases)</pre>
+
+                </div>
+
+            </details>
+
+        </div>
+
+
+
+        <!-- ServiceNow Component Section -->
+
+        <div class="card">
+
+            <h2>My Support Cases</h2>
+
+            <p style="color: #718096; margin-bottom: 20px;">
+
+                Your open support cases will appear below once authenticated
+
+            </p>
+
+
+
+            <div class="embed-container">
+
+                <!-- ServiceNow Web Embeddable Component -->
+
+                <!-- Module: PhucBuiPoC -->
+
+                <!-- Group: Group 1 -->
+
+                <!-- Instance: Demo List v1 -->
+
+                <sn-embedx-case-list table="sn_customerservice_case" limit="10" list-title="List of Cases"
+                    query="state=10" columns="number,short_description,sys_updated_on,state">
+
                 </sn-embedx-case-list>
+
+
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- CRITICAL: Load as ES6 module with type="module" -->
+
+
+
+
+    <!-- ServiceNow Web Embeddables - Global Initialization -->
+
     <script type="module">
-        // Dynamically import the ServiceNow SDK
-        const snModule = await import('https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx');
-        
-        console.log('✅ ServiceNow module loaded:', snModule);
-        
-        // Extract functions from the module
-        const { init, login, logout, getEmbeddables } = snModule;
 
-        // Configuration
-        const CONFIG = {
-            theme: '31bf91ae07203010e03948f78ad30095',
-            baseURL: 'https://sccitsmsit.service-now.com',
-            module: '8f3596311bc57610f94cffb7d34bcbca'
-        };
+        import { init, login, logout } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
 
-        // State management
-        let isLoggedIn = false;
-        let isInitialized = false;
 
-        // DOM elements
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const statusIndicator = document.getElementById('statusIndicator');
-        const statusText = document.getElementById('statusText');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const caseListContainer = document.getElementById('caseListContainer');
-        const alertContainer = document.getElementById('alertContainer');
 
-        // Auth callback function
+        await init({
+
+            theme: '31bf91ae07203010e03948f78ad30095',  /* sys_id of the theme to use for the embeddable components in your website*/
+
+            baseURL: 'https://sccitsmsit.service-now.com', /* Base URL of the instance to be used for the embeddable components in your website*/
+
+            authCallback: getTokenCallBack, /* Function which returns the auth token for the current user, required for auth setup*/
+
+            module: '8f3596311bc57610f94cffb7d34bcbca', /* PhucBuiPoC*/
+
+            // cacheComponents: ["sn-embedx-case-form","sn-embedx-case-list","sn-embedx-case-view","sn-embedx-catalog-item-form","903894c1b742301035a36161de11a992","sn-embedx-kb-article-view","sn-embedx-object-list"] /* Pre-caches resources for improved performance. Update component list as per your usage */
+
+        });
+
         function getTokenCallBack() {
-            console.log('⚠️ getTokenCallBack called - Implement actual token retrieval here');
-            // TODO: Replace with your actual token retrieval logic
-            const idToken = null;
+
+            var idToken; /* Get the id token for the current user */
+
             return Promise.resolve(idToken);
+
         }
 
-        // Show alert message
-        function showAlert(message, type = 'success', details = null) {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type} show`;
-            alert.textContent = message;
-            
-            if (details) {
-                const detailsDiv = document.createElement('div');
-                detailsDiv.className = 'error-details';
-                detailsDiv.textContent = details;
-                alert.appendChild(detailsDiv);
-            }
-            
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alert);
-            
-            if (type === 'success') {
-                setTimeout(() => {
-                    alert.classList.remove('show');
-                }, 5000);
-            }
-        }
-
-        // Update UI status
-        function updateStatus(status, text) {
-            statusIndicator.className = `status-indicator ${status}`;
-            statusText.textContent = text;
-        }
-
-        // Initialize ServiceNow Embeddables
-        async function initializeEmbeddables() {
-            try {
-                updateStatus('', 'Initializing ServiceNow...');
-                console.log('🚀 Starting initialization with config:', CONFIG);
-                
-                await init({
-                    theme: CONFIG.theme,
-                    baseURL: CONFIG.baseURL,
-                    authCallback: getTokenCallBack,
-                    module: CONFIG.module,
-                    interceptSessionTimeout: true,
-                    cacheComponents: ["sn-embedx-case-list"]
-                });
-
-                isInitialized = true;
-                updateStatus('connected', 'Connected to ServiceNow');
-                console.log('✅ Initialization successful');
-                
-                // Enable login button
-                loginBtn.disabled = false;
-                
-                // Load the case list component
-                console.log('📦 Loading case list component...');
-                await getEmbeddables(["sn-embedx-case-list"]);
-                
-                loadingIndicator.style.display = 'none';
-                caseListContainer.style.display = 'block';
-                
-                showAlert('ServiceNow components loaded successfully!', 'success');
-                console.log('✅ Component loaded successfully');
-                
-            } catch (error) {
-                console.error('❌ Initialization error:', error);
-                updateStatus('disconnected', 'Connection failed');
-                showAlert(
-                    'Failed to initialize ServiceNow components', 
-                    'error',
-                    `Error: ${error.message}\n\nCheck browser console for details.`
-                );
-                loadingIndicator.innerHTML = '<p style="color: #e74c3c;">❌ Failed to load. Check console and refresh.</p>';
-            }
-        }
-
-        // Handle login
-        async function handleLogin() {
-            if (!isInitialized) {
-                showAlert('Please wait for initialization to complete', 'warning');
-                return;
-            }
-
-            try {
-                loginBtn.disabled = true;
-                loginBtn.textContent = 'Logging in...';
-                updateStatus('', 'Authenticating...');
-                console.log('🔐 Attempting login...');
-
-                await login();
-                
-                isLoggedIn = true;
-                loginBtn.textContent = 'Logged In';
-                logoutBtn.disabled = false;
-                updateStatus('connected', 'Logged in');
-                showAlert('Login successful!', 'success');
-                console.log('✅ Login successful');
-                
-            } catch (error) {
-                console.error('❌ Login error:', error);
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Login';
-                updateStatus('disconnected', 'Login failed');
-                showAlert(
-                    'Login failed', 
-                    'error',
-                    `${error.message}\n\nEnsure getTokenCallBack() returns a valid token.`
-                );
-            }
-        }
-
-        // Handle logout
-        async function handleLogout() {
-            try {
-                logoutBtn.disabled = true;
-                logoutBtn.textContent = 'Logging out...';
-                updateStatus('', 'Logging out...');
-                console.log('🚪 Attempting logout...');
-
-                await logout();
-                
-                isLoggedIn = false;
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Login';
-                logoutBtn.disabled = true;
-                logoutBtn.textContent = 'Logout';
-                updateStatus('connected', 'Logged out');
-                showAlert('Logout successful!', 'success');
-                console.log('✅ Logout successful');
-                
-            } catch (error) {
-                console.error('❌ Logout error:', error);
-                logoutBtn.disabled = false;
-                logoutBtn.textContent = 'Logout';
-                showAlert('Logout failed: ' + error.message, 'error');
-            }
-        }
-
-        // Event listeners for buttons
-        loginBtn.addEventListener('click', handleLogin);
-        logoutBtn.addEventListener('click', handleLogout);
-
-        // Listen for ServiceNow events
-        document.addEventListener('SN_EMBEDDABLES_READY', function() {
-            console.log('✅ SN_EMBEDDABLES_READY event fired');
-        });
-
-        document.addEventListener('SN_EMBEDDABLES_SESSION_EXPIRED', function() {
-            console.log('⚠️ Session expired');
-            showAlert('Your session has expired. Please login again.', 'warning');
-            isLoggedIn = false;
-            loginBtn.disabled = false;
-            loginBtn.textContent = 'Login';
-            logoutBtn.disabled = true;
-            updateStatus('disconnected', 'Session expired');
-        });
-
-        document.addEventListener('SN_EMBEDDABLES_LOGIN_SUCCESS', function() {
-            console.log('✅ Login success event');
-        });
-
-        document.addEventListener('SN_EMBEDDABLES_LOGOUT_SUCCESS', function() {
-            console.log('✅ Logout success event');
-        });
-
-        // Make functions globally available for debugging
-        window.snApp = {
-            login: handleLogin,
-            logout: handleLogout,
-            reinitialize: initializeEmbeddables,
-            state: function() { 
-                return { 
-                    isLoggedIn, 
-                    isInitialized
-                }; 
-            }
-        };
-        
-        console.log('🐛 Debug: window.snApp available');
-        console.log('🐛 Available functions:', Object.keys(window.snApp));
-
-        // Start initialization
-        console.log('🎬 Starting initialization...');
-        initializeEmbeddables();
     </script>
+
+
+
+    <script type="module">
+
+        import { getEmbeddables } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+
+
+
+        getEmbeddables(["sn-embedx-case-list"]);
+
+    </script>
+
+
+
+    <!-- Login/Logout handlers -->
+
+    <script>
+
+        async function handleLogin() {
+
+
+
+        }
+
+
+
+        async function handleLogout() {
+
+
+
+        }
+
+
+
+        // Check browser compatibility
+
+        window.addEventListener('DOMContentLoaded', () => {
+
+            console.log('Customer Portal loaded');
+
+
+
+            // Check if third-party cookies are enabled
+
+            if (!navigator.cookieEnabled) {
+
+                console.warn('Cookies are disabled. Please enable cookies for the best experience.');
+
+            }
+
+
+
+            // Log configuration
+
+            console.log('Configuration:');
+
+            console.log('  - Instance: https://sccitsmsit.service-now.com');
+
+            console.log('  - Module: PhucBuiPoC');
+
+            console.log('  - Component: sn-embedx-case-list');
+
+        });
+
+    </script>
+
 </body>
-</html>
