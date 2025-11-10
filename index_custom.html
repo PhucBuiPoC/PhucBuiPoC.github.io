@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Portal - My Support Cases v.0.0.1</title>
+    <title>Customer Portal - My Support Cases</title>
     <style>
         * {
             margin: 0;
@@ -67,6 +67,14 @@
             margin-bottom: 20px;
         }
 
+        .warning-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
         .embed-container {
             min-height: 400px;
             background: #f7fafc;
@@ -76,16 +84,57 @@
         }
     </style>
 
-    <!-- Import from YOUR fixed local file -->
+    <!-- CORS Bypass - Load this FIRST before any ServiceNow imports -->
+    <script>
+        // CORS Proxy configuration
+        const PROXY_URL = 'https://corsproxy.io/?';
+        
+        // Store original fetch
+        const originalFetch = window.fetch;
+        
+        // Override fetch to use proxy
+        window.fetch = function(url, options = {}) {
+            if (typeof url === 'string' && url.includes('sccitsmsit.service-now.com')) {
+                console.log('Proxying request:', url);
+                const proxiedURL = PROXY_URL + encodeURIComponent(url);
+                
+                // Remove credentials when using proxy
+                const newOptions = { ...options };
+                delete newOptions.credentials;
+                
+                return originalFetch(proxiedURL, newOptions);
+            }
+            return originalFetch(url, options);
+        };
+        
+        // Also override XMLHttpRequest
+        const originalOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+            if (typeof url === 'string' && url.includes('sccitsmsit.service-now.com')) {
+                console.log('Proxying XHR:', url);
+                url = PROXY_URL + encodeURIComponent(url);
+            }
+            return originalOpen.call(this, method, url, ...rest);
+        };
+        
+        console.log('CORS proxy initialized');
+    </script>
+
+    <!-- Now load ServiceNow modules -->
     <script type="module">
         import { init, login, logout } from './index.js';
 
-        await init({
-            theme: '31bf91ae07203010e03948f78ad30095',
-            baseURL: 'https://sccitsmsit.service-now.com',
-            authCallback: getTokenCallBack,
-            module: '8f3596311bc57610f94cffb7d34bcbca',
-        });
+        try {
+            await init({
+                theme: '31bf91ae07203010e03948f78ad30095',
+                baseURL: 'https://sccitsmsit.service-now.com',
+                authCallback: getTokenCallBack,
+                module: '8f3596311bc57610f94cffb7d34bcbca',
+            });
+            console.log('Init completed');
+        } catch (error) {
+            console.error('Init failed:', error);
+        }
 
         function getTokenCallBack() {
             var idToken;
@@ -98,19 +147,24 @@
     <div class="container">
         <div class="header">
             <h1>Customer Support Portal v.0.5</h1>
-            <p>View and manage your company's support cases - Fixed Version</p>
+            <p>View and manage your company's support cases</p>
         </div>
 
         <div class="card">
             <h2>Configuration Status</h2>
+            
+            <div class="warning-box">
+                <h4>CORS Proxy Active</h4>
+                <p><strong>Note:</strong> Using CORS proxy (corsproxy.io) for development. Not for production use.</p>
+            </div>
+
             <div class="success-box">
-                <h4>ServiceNow Configuration (Using Fixed Code)</h4>
+                <h4>ServiceNow Configuration</h4>
                 <ul style="margin-left: 20px; margin-top: 10px;">
                     <li><strong>Instance:</strong> sccitsmsit.service-now.com</li>
                     <li><strong>Module:</strong> PhucBuiPoC (8f3596311bc57610f94cffb7d34bcbca)</li>
-                    <li><strong>Theme:</strong> 31bf91ae07203010e03948f78ad30095</li>
                     <li><strong>Component:</strong> sn-embedx-case-list</li>
-                    <li><strong>Fix Applied:</strong> Imports moved to top level</li>
+                    <li><strong>Proxy:</strong> corsproxy.io</li>
                 </ul>
             </div>
         </div>
@@ -133,11 +187,15 @@
         </div>
     </div>
 
-    <!-- Import from YOUR fixed local file -->
     <script type="module">
         import { getEmbeddables } from './index.js';
         
-        await getEmbeddables(["sn-embedx-case-list"]);
+        try {
+            await getEmbeddables(["sn-embedx-case-list"]);
+            console.log('Components loaded');
+        } catch (error) {
+            console.error('Component loading failed:', error);
+        }
     </script>
 </body>
 </html>
