@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal - My Support Cases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+
+        .card h2 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+
+        .success-box {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+
+        .embed-container {
+            min-height: 400px;
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px dashed #cbd5e0;
+        }
+
+
+        .debug-toggle {
+            background: #edf2f7;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            user-select: none;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+
+        .debug-toggle:hover {
+            background: #e2e8f0;
+        }
+
+
+        .debug-toggle-icon {
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+
+
+        .debug-toggle-icon.open {
+            transform: rotate(90deg);
+        }
+
+
+        .debug-content {
+            display: none;
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+
+        .debug-content.show {
+            display: block;
+        }
+
+
+        .debug-line {
+            padding: 3px 0;
+            border-bottom: 1px solid #4a5568;
+        }
+
+
+        .debug-line:last-child {
+            border-bottom: none;
+        }
+
+
+        .log-success { color: #48bb78; }
+        .log-error { color: #f56565; }
+        .log-warn { color: #f6ad55; }
+        .log-info { color: #4299e1; }
+
+
+        .module-file {
+            margin-bottom: 15px;
+        }
+
+
+        .module-file-header {
+            background: #4a5568;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+
+        .module-file-header:hover {
+            background: #2d3748;
+        }
+
+
+        .module-file-content {
+            display: none;
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 0 0 6px 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 500px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+
+        .module-file-content.show {
+            display: block;
+        }
+
+
+        .module-stats {
+            background: #ebf4ff;
+            border-left: 4px solid #4299e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+
+        .module-stats ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+
+        .btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+
+        .loading-text {
+            color: #f6ad55;
+            font-style: italic;
+        }
+
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        .expand-icon {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Customer Support Portal v.0.5</h1>
+            <p>View and manage your company's support cases</p>
+        </div>
+
+
+        <div class="card">
+            <h2>Configuration Status</h2>
+            <div class="success-box">
+                <h4>ServiceNow Configuration</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Instance:</strong> sccitsmsit.service-now.com</li>
+                    <li><strong>Module:</strong> PhucBuiPoC (8f3596311bc57610f94cffb7d34bcbca)</li>
+                    <li><strong>Theme:</strong> 31bf91ae07203010e03948f78ad30095</li>
+                    <li><strong>Component:</strong> sn-embedx-case-list</li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <h2>My Support Cases</h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                Your open support cases will appear below
+            </p>
+
+
+            <div class="embed-container">
+                <div id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p style="text-align: center; color: #718096;">Loading ServiceNow component...</p>
+                </div>
+
+
+                <sn-embedx-case-list
+                    id="snCaseList"
+                    table="sn_customerservice_case"
+                    limit="10"
+                    list-title="List of Cases"
+                    query="state=10"
+                    columns="number,short_description,sys_updated_on,state">
+                </sn-embedx-case-list>
+            </div>
+
+
+            <!-- DEBUG SECTION START -->
+            <div class="debug-toggle" onclick="toggleDebug()">
+                <span>Debug Console</span>
+                <span class="debug-toggle-icon" id="debugIcon">&#9658;</span>
+            </div>
+            <div class="debug-content show" id="debugContent">
+                <div id="debugMessages"></div>
+            </div>
+            <!-- DEBUG SECTION END -->
+        </div>
+
+
+        <div class="card">
+            <h2>ServiceNow Module Inspector</h2>
+            <p style="color: #718096; margin-bottom: 20px;">
+                Analyze the ServiceNow embeddables module and its dependencies
+            </p>
+
+
+            <button class="btn" onclick="analyzeModule()">
+                Analyze Module Files
+            </button>
+
+
+            <div id="moduleStats"></div>
+            <div id="moduleFiles"></div>
+        </div>
+    </div>
+
+
+    <script>
+        const CONFIG = {
+            theme: '31bf91ae07203010e03948f78ad30095',
+            baseURL: 'https://sccitsmsit.service-now.com',
+            module: '8f3596311bc57610f94cffb7d34bcbca',
+            components: ["sn-embedx-case-list"]
+        };
+
+
+        const Logger = {
+            el: null,
+           
+            init() {
+                this.el = document.getElementById('debugMessages');
+            },
+           
+            write(msg, level) {
+                if (!this.el) return;
+               
+                const time = new Date().toLocaleTimeString();
+                const line = document.createElement('div');
+                line.className = `debug-line log-${level}`;
+                line.textContent = `[${time}] ${msg}`;
+                this.el.appendChild(line);
+                this.el.parentElement.scrollTop = this.el.parentElement.scrollHeight;
+               
+                const method = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log';
+                console[method](`[${time}] ${msg}`);
+            },
+           
+            success(m) { this.write(m, 'success'); },
+            error(m) { this.write(m, 'error'); },
+            warn(m) { this.write(m, 'warn'); },
+            info(m) { this.write(m, 'info'); }
+        };
+
+
+        function toggleDebug() {
+            const content = document.getElementById('debugContent');
+            const icon = document.getElementById('debugIcon');
+            content.classList.toggle('show');
+            icon.classList.toggle('open');
+        }
+
+
+        const ModuleAnalyzer = {
+            baseURL: CONFIG.baseURL,
+            files: new Map(),
+           
+            async fetchFile(url) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return await res.text();
+                } catch (err) {
+                    return `Error: ${err.message}`;
+                }
+            },
+           
+            findImports(code) {
+                const imports = [];
+                const patterns = [
+                    /import\s+["']([^"']+)["']/g,
+                    /import\s+{[^}]*}\s+from\s+["']([^"']+)["']/g,
+                    /import\s+\*\s+as\s+\w+\s+from\s+["']([^"']+)["']/g,
+                    /import\s+\w+\s+from\s+["']([^"']+)["']/g
+                ];
+               
+                for (const pattern of patterns) {
+                    let match;
+                    while ((match = pattern.exec(code)) !== null) {
+                        imports.push(match[1]);
+                    }
+                }
+               
+                return [...new Set(imports)];
+            },
+           
+            resolveURL(base, path) {
+                if (path.startsWith('http://') || path.startsWith('https://')) {
+                    return path;
+                }
+                if (path.startsWith('/')) {
+                    return this.baseURL + path;
+                }
+                const dir = base.substring(0, base.lastIndexOf('/'));
+                return dir + '/' + path;
+            },
+           
+            async analyze(url, depth = 0, maxDepth = 5) {
+                if (depth > maxDepth || this.files.has(url)) return;
+               
+                Logger.info(`Fetching [depth ${depth}]: ${url}`);
+               
+                const content = await this.fetchFile(url);
+                this.files.set(url, { url, content, depth, size: content.length });
+               
+                const imports = this.findImports(content);
+               
+                if (imports.length > 0) {
+                    Logger.info(`Found ${imports.length} imports`);
+                }
+               
+                for (const imp of imports) {
+                    const resolved = this.resolveURL(url, imp);
+                    await this.analyze(resolved, depth + 1, maxDepth);
+                }
+            },
+           
+            display() {
+                const stats = document.getElementById('moduleStats');
+                const files = document.getElementById('moduleFiles');
+               
+                const total = this.files.size;
+                const size = Array.from(this.files.values())
+                    .reduce((sum, f) => sum + f.size, 0);
+               
+                stats.innerHTML = `
+                    <div class="module-stats">
+                        <h4 style="color: #2c5282; margin-bottom: 10px;">Analysis Results</h4>
+                        <ul style="color: #2c5282;">
+                            <li><strong>Total Files:</strong> ${total}</li>
+                            <li><strong>Total Size:</strong> ${(size / 1024).toFixed(2)} KB</li>
+                            <li><strong>Max Depth:</strong> ${Math.max(...Array.from(this.files.values()).map(f => f.depth))}</li>
+                        </ul>
+                    </div>
+                `;
+               
+                files.innerHTML = '';
+                let idx = 0;
+                for (const [url, data] of this.files) {
+                    idx++;
+                    const name = url.split('/').pop() || url;
+                    const indent = '  '.repeat(data.depth);
+                   
+                    const div = document.createElement('div');
+                    div.className = 'module-file';
+                    div.innerHTML = `
+                        <div class="module-file-header" onclick="toggleFile(${idx})">
+                            <span>${indent}${name} (${(data.size / 1024).toFixed(2)} KB, depth: ${data.depth})</span>
+                            <span class="expand-icon" id="fileIcon${idx}">&#9658;</span>
+                        </div>
+                        <div class="module-file-content" id="fileContent${idx}">
+                            <div style="margin-bottom: 10px; color: #48bb78;">URL: ${url}</div>
+                            ${data.content}
+                        </div>
+                    `;
+                    files.appendChild(div);
+                }
+            }
+        };
+
+
+        function toggleFile(idx) {
+            const content = document.getElementById(`fileContent${idx}`);
+            const icon = document.getElementById(`fileIcon${idx}`);
+            content.classList.toggle('show');
+            icon.innerHTML = content.classList.contains('show') ? '&#9660;' : '&#9658;';
+        }
+
+
+        async function analyzeModule() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+           
+            document.getElementById('moduleStats').innerHTML = '<p class="loading-text">Analyzing module files...</p>';
+            document.getElementById('moduleFiles').innerHTML = '';
+           
+            ModuleAnalyzer.files.clear();
+           
+            try {
+                const mainURL = CONFIG.baseURL + '/uxasset/externals/sn_embeddable_core/index.jsdbx';
+                await ModuleAnalyzer.analyze(mainURL);
+                ModuleAnalyzer.display();
+                Logger.success('Analysis complete');
+            } catch (err) {
+                Logger.error(`Analysis failed: ${err.message}`);
+                document.getElementById('moduleStats').innerHTML = `<p style="color: #e53e3e;">Error: ${err.message}</p>`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Analyze Module Files';
+            }
+        }
+
+
+        function getTokenCallBack() {
+            Logger.info('getTokenCallBack called');
+            return Promise.resolve(null);
+        }
+
+
+        // Load the SDK dynamically and check for errors
+        function loadSDK() {
+            return new Promise((resolve, reject) => {
+                Logger.info('Creating script element...');
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = CONFIG.baseURL + '/uxasset/externals/sn_embeddable_core/index.jsdbx';
+                script.crossOrigin = 'anonymous';
+               
+                script.onload = () => {
+                    Logger.success('Script loaded successfully');
+                   
+                    // Check what's available
+                    Logger.info('Checking window.SN_EMBEDDABLES...');
+                    if (window.SN_EMBEDDABLES) {
+                        Logger.success('window.SN_EMBEDDABLES found');
+                        Logger.info(`Methods: ${Object.keys(window.SN_EMBEDDABLES).join(', ')}`);
+                    } else {
+                        Logger.warn('window.SN_EMBEDDABLES NOT found');
+                    }
+                   
+                    // Check for other potential global variables
+                    const potentialVars = ['sn_embeddables', 'snEmbeddables', 'ServiceNow', 'SN'];
+                    for (const v of potentialVars) {
+                        if (window[v]) {
+                            Logger.info(`Found window.${v}`);
+                        }
+                    }
+                   
+                    resolve();
+                };
+               
+                script.onerror = (e) => {
+                    Logger.error('Script failed to load');
+                    Logger.error(`Error event: ${JSON.stringify(e)}`);
+                    reject(new Error('Script loading failed - check CORS or network'));
+                };
+               
+                Logger.info(`Loading: ${script.src}`);
+                document.head.appendChild(script);
+            });
+        }
+
+
+        function waitForSNEmbeddables(timeout = 10000) {
+            return new Promise((resolve, reject) => {
+                Logger.info('Waiting for SN_EMBEDDABLES_READY event...');
+               
+                if (window.SN_EMBEDDABLES) {
+                    Logger.success('window.SN_EMBEDDABLES already available');
+                    resolve();
+                    return;
+                }
+               
+                const checkInterval = setInterval(() => {
+                    if (window.SN_EMBEDDABLES) {
+                        clearInterval(checkInterval);
+                        clearTimeout(timeoutId);
+                        Logger.success('window.SN_EMBEDDABLES appeared');
+                        resolve();
+                    }
+                }, 100);
+               
+                const timeoutId = setTimeout(() => {
+                    clearInterval(checkInterval);
+                    Logger.error('Timeout waiting for SN_EMBEDDABLES');
+                   
+                    // Last chance - check what IS in window
+                    Logger.info('Dumping window object keys containing "sn" or "SN":');
+                    const keys = Object.keys(window).filter(k => k.toLowerCase().includes('sn'));
+                    Logger.info(keys.length > 0 ? keys.join(', ') : 'None found');
+                   
+                    reject(new Error('Timeout waiting for SN_EMBEDDABLES'));
+                }, timeout);
+               
+                document.addEventListener('SN_EMBEDDABLES_READY', () => {
+                    clearInterval(checkInterval);
+                    clearTimeout(timeoutId);
+                    Logger.success('SN_EMBEDDABLES_READY event fired');
+                    resolve();
+                });
+            });
+        }
+
+
+        async function init() {
+            try {
+                Logger.init();
+                Logger.info('Starting initialization');
+                Logger.info('Browser: ' + navigator.userAgent);
+               
+                // Load the SDK
+                await loadSDK();
+               
+                // Wait for it to be ready
+                await waitForSNEmbeddables();
+               
+                if (!window.SN_EMBEDDABLES) {
+                    throw new Error('window.SN_EMBEDDABLES still not available');
+                }
+               
+                Logger.info('Calling init...');
+                await window.SN_EMBEDDABLES.init({
+                    theme: CONFIG.theme,
+                    baseURL: CONFIG.baseURL,
+                    authCallback: getTokenCallBack,
+                    module: CONFIG.module,
+                    interceptSessionTimeout: false,
+                    cacheComponents: CONFIG.components
+                });
+               
+                Logger.success('init completed');
+               
+                Logger.info('Loading components...');
+                await window.SN_EMBEDDABLES.getEmbeddables(CONFIG.components);
+               
+                Logger.success('Components loaded');
+               
+                setTimeout(() => {
+                    const comp = document.getElementById('snCaseList');
+                    if (comp) {
+                        Logger.info('Checking component...');
+                        Logger.info(`Custom element defined: ${!!customElements.get('sn-embedx-case-list')}`);
+                        Logger.info(`Has shadow root: ${!!comp.shadowRoot}`);
+                        if (comp.shadowRoot) {
+                            Logger.info(`Shadow children: ${comp.shadowRoot.children.length}`);
+                        }
+                    }
+                }, 2000);
+               
+                document.getElementById('loadingIndicator').style.display = 'none';
+               
+                Logger.success('Done');
+               
+            } catch (err) {
+                Logger.error(`Failed: ${err.message}`);
+                console.error(err);
+               
+                document.getElementById('loadingIndicator').innerHTML = `
+                    <div style="color: #e53e3e; text-align: center;">
+                        <h3>Failed to Load</h3>
+                        <p>${err.message}</p>
+                        <p style="margin-top: 10px; font-size: 14px;">Check Debug Console and browser Network tab</p>
+                    </div>
+                `;
+            }
+        }
+
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

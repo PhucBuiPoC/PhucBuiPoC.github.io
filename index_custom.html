@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Portal - My Support Cases</title>
+    <title>Customer Portal - My Support Cases v.0.0.1</title>
     <style>
         * {
             margin: 0;
@@ -76,26 +76,21 @@
         }
     </style>
 
-    <!-- ServiceNow Global Code - Official Implementation -->
+    <!-- Import from YOUR fixed local file -->
     <script type="module">
-        import { init, login, logout } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+        import { init, login, logout } from './index.js';
 
         await init({
-            theme: '31bf91ae07203010e03948f78ad30095',  /* sys_id of the theme to use for the embeddable components in your website*/
-            baseURL: 'https://sccitsmsit.service-now.com', /* Base URL of the instance to be used for the embeddable components in your website*/
-            authCallback: getTokenCallBack, /* Function which returns the auth token for the current user, required for auth setup*/
-            module: '8f3596311bc57610f94cffb7d34bcbca', /* PhucBuiPoC*/
-            // cacheComponents: ["sn-embedx-case-form","sn-embedx-case-list","sn-embedx-case-view","sn-embedx-catalog-item-form","903894c1b742301035a36161de11a992","sn-embedx-kb-article-view","sn-embedx-object-list"] /* Pre-caches resources for improved performance. Update component list as per your usage */
+            theme: '31bf91ae07203010e03948f78ad30095',
+            baseURL: 'https://sccitsmsit.service-now.com',
+            authCallback: getTokenCallBack,
+            module: '8f3596311bc57610f94cffb7d34bcbca',
         });
 
         function getTokenCallBack() {
-            var idToken; /* Get the id token for the current user */
+            var idToken;
             return Promise.resolve(idToken);
         }
-
-        /* Uncomment below functions to handle login and logout once the user logs into your website */
-        // await login();
-        // await logout();
     </script>
 </head>
 
@@ -103,18 +98,19 @@
     <div class="container">
         <div class="header">
             <h1>Customer Support Portal v.0.5</h1>
-            <p>View and manage your company's support cases</p>
+            <p>View and manage your company's support cases - Fixed Version</p>
         </div>
 
         <div class="card">
             <h2>Configuration Status</h2>
             <div class="success-box">
-                <h4>ServiceNow Configuration</h4>
+                <h4>ServiceNow Configuration (Using Fixed Code)</h4>
                 <ul style="margin-left: 20px; margin-top: 10px;">
                     <li><strong>Instance:</strong> sccitsmsit.service-now.com</li>
                     <li><strong>Module:</strong> PhucBuiPoC (8f3596311bc57610f94cffb7d34bcbca)</li>
                     <li><strong>Theme:</strong> 31bf91ae07203010e03948f78ad30095</li>
                     <li><strong>Component:</strong> sn-embedx-case-list</li>
+                    <li><strong>Fix Applied:</strong> Imports moved to top level</li>
                 </ul>
             </div>
         </div>
@@ -125,13 +121,7 @@
                 Your open support cases will appear below
             </p>
 
-            <!-- ServiceNow Component Code - Official Implementation -->
             <div class="embed-container">
-                <!--  
-                    Module: PhucBuiPoC
-                    Group: Group 1
-                    Instance: Demo List v1
-                -->
                 <sn-embedx-case-list
                     table="sn_customerservice_case"
                     limit="10"
@@ -139,28 +129,15 @@
                     query="state=10"
                     columns="number,short_description,sys_updated_on,state">
                 </sn-embedx-case-list>
-                <!--
-                    The component also includes the following additional properties:
-                    hide-header
-                    hide-last-refreshed-text
-                    hide-record-count
-                    hide-search
-                    hide-refresh
-                    show-filters
-                    hide-when-empty
-                    disable-column-resizing
-                    hide-errors
-                    view
-                -->
             </div>
         </div>
     </div>
 
-    <!-- ServiceNow Component Code Script - Official Implementation -->
+    <!-- Import from YOUR fixed local file -->
     <script type="module">
-        import { getEmbeddables } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+        import { getEmbeddables } from './index.js';
         
-        getEmbeddables(["sn-embedx-case-list"]);
+        await getEmbeddables(["sn-embedx-case-list"]);
     </script>
 </body>
 </html>
