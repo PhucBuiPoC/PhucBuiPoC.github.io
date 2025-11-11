@@ -134,26 +134,28 @@
 
         <!-- OAuth Test Card (for manual testing only - not persisted) -->
         <div class="card">
-            <h2>OAuth Configuration (Test)</h2>
+            <h2>OAuth Configuration</h2>
 
             <div style="margin-top:10px;">
                 <label for="test-client-id"><strong>Client ID</strong></label>
                 <br>
-                <input id="test-client-id" type="text" placeholder="Enter clientId here" style="width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #e2e8f0;">
+                <input id="test-client-id" type="text" placeholder="Enter clientId"
+                    style="width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #e2e8f0;">
             </div>
 
             <div style="margin-top:12px;">
                 <label for="test-client-secret"><strong>Client Secret</strong></label>
                 <br>
-                <input id="test-client-secret" type="password" placeholder="Enter clientSecret here (not saved)" style="width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #e2e8f0;">
+                <input id="test-client-secret" type="password" placeholder="Enter clientSecret"
+                    style="width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #e2e8f0;">
             </div>
 
             <div style="margin-top:16px; display:flex; gap:10px;">
-                <button id="oauth-login-btn" style="flex:1; padding:10px; border-radius:8px; border:none; background:#2b6cb0; color:white; cursor:pointer;">Login</button>
-                <button id="oauth-logout-btn" style="flex:1; padding:10px; border-radius:8px; border:none; background:#e53e3e; color:white; cursor:pointer;">Logout</button>
+                <button id="oauth-login-btn"
+                    style="flex:1; padding:10px; border-radius:8px; border:none; background:#2b6cb0; color:white; cursor:pointer;">Login</button>
+                <button id="oauth-logout-btn"
+                    style="flex:1; padding:10px; border-radius:8px; border:none; background:#e53e3e; color:white; cursor:pointer;">Logout</button>
             </div>
-
-            <p style="color:#718096; margin-top:12px; font-size:13px;">Note: Values entered here are for testing only and are not saved. Use the <em>Login</em> button to initiate the OAuth authorization flow (you will be redirected to the identity provider). After successful authentication the callback will redirect back.</p>
         </div>
 
         <div class="card">
@@ -184,7 +186,7 @@
     <script src="oauth-config.js"></script>
     <script>
         // Simple login/logout handlers for manual testing
-        (function(){
+        (function () {
             const loginBtn = document.getElementById('oauth-login-btn');
             const logoutBtn = document.getElementById('oauth-logout-btn');
             const clientIdInput = document.getElementById('test-client-id');
@@ -195,7 +197,7 @@
                 return;
             }
 
-            loginBtn.addEventListener('click', function(){
+            loginBtn.addEventListener('click', function () {
                 const clientId = clientIdInput.value.trim();
                 const clientSecret = clientSecretInput.value;
                 console.log('[OAuth Test] Login clicked');
@@ -228,7 +230,7 @@
                 }
             });
 
-            logoutBtn.addEventListener('click', function(){
+            logoutBtn.addEventListener('click', function () {
                 console.log('[OAuth Test] Logout clicked');
                 if (window.oauthManager && typeof window.oauthManager.clearTokens === 'function') {
                     window.oauthManager.clearTokens();
