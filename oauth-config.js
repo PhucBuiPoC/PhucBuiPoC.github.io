@@ -53,7 +53,8 @@ class OAuthManager {
             client_id: this.config.clientId,
             client_secret: this.config.clientSecret
         });
-
+        
+        console.log('Token exchange params:', params.toString());
         try {
             const response = await fetch(
                 `${this.config.instanceUrl}${this.config.tokenEndpoint}`,
