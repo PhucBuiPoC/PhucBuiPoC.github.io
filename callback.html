@@ -60,14 +60,6 @@
                     throw new Error('Invalid state parameter - possible CSRF attack');
                 }
 
-                // Try to restore PKCE verifier from state if it's encoded there (helps testing across origins)
-                try {
-                    const restored = window.oauthManager.restorePkceFromState(state);
-                    if (restored) console.log('PKCE code_verifier restored from state');
-                } catch (e) {
-                    console.warn('Error while attempting to restore PKCE verifier from state:', e);
-                }
-
                 // Exchange code for tokens
                 console.log('Exchanging authorization code for tokens...');
                 await window.oauthManager.exchangeCodeForToken(code);
