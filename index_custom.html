@@ -105,7 +105,7 @@
             // Return the id_token produced by the OAuth callback (if present)
             // callback.html stores tokens in sessionStorage when exchange succeeds.
             try {
-                const idToken = sessionStorage.getItem('id_token') || null;
+                const idToken = sessionStorage.getItem('access_token') || null;
                 console.log('[getTokenCallBack] returning id_token from sessionStorage:', idToken ? 'present' : 'none');
                 return Promise.resolve(idToken);
             } catch (err) {
