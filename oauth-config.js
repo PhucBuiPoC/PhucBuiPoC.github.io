@@ -95,16 +95,42 @@ class OAuthManager {
     }
 
     // Generate random state for CSRF protection
-    generateState() {
-        const state = Math.random().toString(36).substring(7);
-        sessionStorage.setItem('oauth_state', state);
-        return state;
+    generateState(codeVerifier) {
+        const token = Math.random().toString(36).substring(7);
+        // If a codeVerifier is provided, include it in the state payload so it can be restored on callback
+        const payload = codeVerifier ? { s: token, v: codeVerifier } : { s: token };
+        const json = JSON.stringify(payload);
+        const base64 = btoa(json).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        // store the encoded state so verifyState can compare it on callback
+        sessionStorage.setItem('oauth_state', base64);
+        return base64;
     }
 
     // Verify state
     verifyState(state) {
         const savedState = sessionStorage.getItem('oauth_state');
         return state === savedState;
+    }
+
+    // Try to restore a PKCE code_verifier out of a returned state value.
+    // This is useful for cases where the browser origin changed between auth start and callback
+    // (for testing) but the state parameter contains the verifier.
+    restorePkceFromState(state) {
+        try {
+            if (!state) return false;
+            // base64url -> base64
+            const b64 = state.replace(/-/g, '+').replace(/_/g, '/');
+            const json = atob(b64);
+            const obj = JSON.parse(json);
+            if (obj && obj.v) {
+                sessionStorage.setItem('pkce_code_verifier', obj.v);
+                console.log('[OAuthManager] Restored PKCE code_verifier from state');
+                return true;
+            }
+        } catch (err) {
+            console.warn('[OAuthManager] Failed to restore PKCE verifier from state:', err);
+        }
+        return false;
     }
 
     // Exchange authorization code for tokens
