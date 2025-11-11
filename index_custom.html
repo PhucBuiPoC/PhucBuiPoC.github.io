@@ -132,6 +132,30 @@
             </div>
         </div>
 
+        <!-- OAuth Test Card (for manual testing only - not persisted) -->
+        <div class="card">
+            <h2>OAuth Configuration (Test)</h2>
+
+            <div style="margin-top:10px;">
+                <label for="test-client-id"><strong>Client ID</strong></label>
+                <br>
+                <input id="test-client-id" type="text" placeholder="Enter clientId here" style="width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #e2e8f0;">
+            </div>
+
+            <div style="margin-top:12px;">
+                <label for="test-client-secret"><strong>Client Secret</strong></label>
+                <br>
+                <input id="test-client-secret" type="password" placeholder="Enter clientSecret here (not saved)" style="width:100%; padding:8px; margin-top:6px; border-radius:6px; border:1px solid #e2e8f0;">
+            </div>
+
+            <div style="margin-top:16px; display:flex; gap:10px;">
+                <button id="oauth-login-btn" style="flex:1; padding:10px; border-radius:8px; border:none; background:#2b6cb0; color:white; cursor:pointer;">Login</button>
+                <button id="oauth-logout-btn" style="flex:1; padding:10px; border-radius:8px; border:none; background:#e53e3e; color:white; cursor:pointer;">Logout</button>
+            </div>
+
+            <p style="color:#718096; margin-top:12px; font-size:13px;">Note: Values entered here are for testing only and are not saved. Use the <em>Login</em> button to initiate the OAuth authorization flow (you will be redirected to the identity provider). After successful authentication the callback will redirect back.</p>
+        </div>
+
         <div class="card">
             <h2>My Support Cases</h2>
             <p style="color: #718096; margin-bottom: 20px;">
@@ -155,6 +179,68 @@
         } catch (error) {
             console.error('Component loading failed:', error);
         }
+    </script>
+    <!-- OAuth test helpers -->
+    <script src="oauth-config.js"></script>
+    <script>
+        // Simple login/logout handlers for manual testing
+        (function(){
+            const loginBtn = document.getElementById('oauth-login-btn');
+            const logoutBtn = document.getElementById('oauth-logout-btn');
+            const clientIdInput = document.getElementById('test-client-id');
+            const clientSecretInput = document.getElementById('test-client-secret');
+
+            if (!loginBtn || !logoutBtn) {
+                console.log('OAuth test elements not present on this page. Skipping handler setup.');
+                return;
+            }
+
+            loginBtn.addEventListener('click', function(){
+                const clientId = clientIdInput.value.trim();
+                const clientSecret = clientSecretInput.value;
+                console.log('[OAuth Test] Login clicked');
+                console.log('[OAuth Test] clientId:', clientId);
+                console.log('[OAuth Test] clientSecret:', clientSecret);
+
+                if (!clientId) {
+                    alert('Please enter a clientId to continue');
+                    return;
+                }
+
+                if (!window.oauthManager) {
+                    console.error('[OAuth Test] oauthManager is not available. Ensure oauth-config.js is loaded.');
+                    alert('OAuth manager not available. See console for details.');
+                    return;
+                }
+
+                // Temporarily set the client config (do not persist anywhere)
+                window.oauthManager.config.clientId = clientId;
+                window.oauthManager.config.clientSecret = clientSecret;
+                console.log('[OAuth Test] oauthManager.config updated (temporary)');
+
+                try {
+                    const authUrl = window.oauthManager.getAuthorizationUrl();
+                    console.log('[OAuth Test] Redirecting to authorization URL:', authUrl);
+                    window.location.href = authUrl;
+                } catch (err) {
+                    console.error('[OAuth Test] Failed to build or redirect to authorization URL:', err);
+                    alert('Failed to start authorization. See console for details.');
+                }
+            });
+
+            logoutBtn.addEventListener('click', function(){
+                console.log('[OAuth Test] Logout clicked');
+                if (window.oauthManager && typeof window.oauthManager.clearTokens === 'function') {
+                    window.oauthManager.clearTokens();
+                    console.log('[OAuth Test] Tokens cleared');
+                } else {
+                    console.warn('[OAuth Test] oauthManager or clearTokens not present');
+                }
+
+                // Refresh the page or redirect to the same page to reflect logout
+                window.location.href = '/index_custom.html';
+            });
+        })();
     </script>
 </body>
 
