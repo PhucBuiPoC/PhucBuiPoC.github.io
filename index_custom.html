@@ -105,6 +105,9 @@
             var idToken;
             return Promise.resolve(idToken);
         }
+
+        await login();
+        // await logout();
     </script>
 </head>
 
@@ -136,12 +139,8 @@
             </p>
 
             <div class="embed-container">
-                <sn-embedx-case-list
-                    table="sn_customerservice_case"
-                    limit="10"
-                    list-title="List of Cases"
-                    query="state=10"
-                    columns="number,short_description,sys_updated_on,state">
+                <sn-embedx-case-list table="sn_customerservice_case" limit="10" list-title="List of Cases"
+                    query="state=10" columns="number,short_description,sys_updated_on,state">
                 </sn-embedx-case-list>
             </div>
         </div>
@@ -149,7 +148,7 @@
 
     <script type="module">
         import { getEmbeddables } from './index.js';
-        
+
         try {
             await getEmbeddables(["sn-embedx-case-list"]);
             console.log('Components loaded');
@@ -158,4 +157,5 @@
         }
     </script>
 </body>
+
 </html>
