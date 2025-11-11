@@ -229,6 +229,14 @@
                 // Temporarily set the client config (do not persist anywhere)
                 window.oauthManager.config.clientId = clientId;
                 window.oauthManager.config.clientSecret = clientSecret;
+                // Persist the values so they are available after the redirect (callback page reads them)
+                try {
+                    sessionStorage.setItem('oauth_client_id', clientId);
+                    sessionStorage.setItem('oauth_client_secret', clientSecret);
+                    console.log('[OAuth Test] persisted clientId/clientSecret to sessionStorage');
+                } catch (e) {
+                    console.warn('[OAuth Test] unable to persist oauth_client_* to sessionStorage:', e);
+                }
                 console.log('[OAuth Test] oauthManager.config updated (temporary)');
 
                 try {

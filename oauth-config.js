@@ -46,14 +46,18 @@ class OAuthManager {
 
     // Exchange authorization code for tokens
     async exchangeCodeForToken(code) {
+        // Prefer explicit config, fall back to values persisted in sessionStorage (set by the caller page)
+        const clientId = this.config.clientId || sessionStorage.getItem('oauth_client_id') || '';
+        const clientSecret = this.config.clientSecret || sessionStorage.getItem('oauth_client_secret') || '';
+
         const params = new URLSearchParams({
             grant_type: 'authorization_code',
             code: code,
             redirect_uri: this.config.redirectUri,
-            client_id: this.config.clientId,
-            client_secret: this.config.clientSecret
+            client_id: clientId,
+            client_secret: clientSecret
         });
-        
+
         console.log('Token exchange params:', params.toString());
         try {
             const response = await fetch(
@@ -119,11 +123,15 @@ class OAuthManager {
             throw new Error('No refresh token available');
         }
 
+        // Use configured client credentials or fall back to stored values
+        const clientId = this.config.clientId || sessionStorage.getItem('oauth_client_id') || '';
+        const clientSecret = this.config.clientSecret || sessionStorage.getItem('oauth_client_secret') || '';
+
         const params = new URLSearchParams({
             grant_type: 'refresh_token',
             refresh_token: refreshToken,
-            client_id: this.config.clientId,
-            client_secret: this.config.clientSecret
+            client_id: clientId,
+            client_secret: clientSecret
         });
 
         try {
@@ -172,6 +180,9 @@ class OAuthManager {
         sessionStorage.removeItem('refresh_token');
         sessionStorage.removeItem('expires_at');
         sessionStorage.removeItem('oauth_state');
+        // Remove persisted client credentials used for the test flow
+        sessionStorage.removeItem('oauth_client_id');
+        sessionStorage.removeItem('oauth_client_secret');
     }
 
     // Check if user is authenticated
@@ -181,5 +192,17 @@ class OAuthManager {
 }
 
 // Export for use
+// If a caller stored clientId / clientSecret in sessionStorage (test flow), merge those in so the
+// manager has the correct values after a redirect back to the callback page.
+try {
+    const _storedClientId = sessionStorage.getItem('oauth_client_id');
+    const _storedClientSecret = sessionStorage.getItem('oauth_client_secret');
+    if (_storedClientId) OAUTH_CONFIG.clientId = _storedClientId;
+    if (_storedClientSecret) OAUTH_CONFIG.clientSecret = _storedClientSecret;
+} catch (e) {
+    // sessionStorage might be unavailable in some contexts; fall back silently
+    console.warn('Could not read sessionStorage for oauth overrides:', e);
+}
+
 window.OAuthManager = OAuthManager;
 window.oauthManager = new OAuthManager(OAUTH_CONFIG);
