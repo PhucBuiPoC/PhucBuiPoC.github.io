@@ -102,8 +102,16 @@
         }
 
         function getTokenCallBack() {
-            var idToken;
-            return Promise.resolve(idToken);
+            // Return the id_token produced by the OAuth callback (if present)
+            // callback.html stores tokens in sessionStorage when exchange succeeds.
+            try {
+                const idToken = sessionStorage.getItem('id_token') || null;
+                console.log('[getTokenCallBack] returning id_token from sessionStorage:', idToken ? 'present' : 'none');
+                return Promise.resolve(idToken);
+            } catch (err) {
+                console.error('[getTokenCallBack] error reading sessionStorage:', err);
+                return Promise.resolve(null);
+            }
         }
 
         await login();
@@ -156,6 +164,9 @@
                 <button id="oauth-logout-btn"
                     style="flex:1; padding:10px; border-radius:8px; border:none; background:#e53e3e; color:white; cursor:pointer;">Logout</button>
             </div>
+
+            <!-- OAuth status (shows login state for testing) -->
+            <div id="oauth-status" style="margin-top:12px; padding:10px; border-radius:8px; background:#f7fafc; border:1px solid #e2e8f0; color:#2d3748; font-size:14px;">Status: <span id="oauth-status-text">Checking...</span></div>
         </div>
 
         <div class="card">
@@ -239,9 +250,44 @@
                     console.warn('[OAuth Test] oauthManager or clearTokens not present');
                 }
 
+                // Update status immediately for quick feedback, then reload
+                updateOAuthStatus();
                 // Refresh the page or redirect to the same page to reflect logout
                 window.location.href = '/index_custom.html';
             });
+
+            // Update the status display based on sessionStorage / oauthManager
+            function updateOAuthStatus() {
+                const statusEl = document.getElementById('oauth-status-text');
+                try {
+                    const idToken = sessionStorage.getItem('id_token');
+                    const expiresAt = sessionStorage.getItem('expires_at');
+
+                    if (idToken) {
+                        let expiryText = 'unknown';
+                        if (expiresAt) {
+                            const ts = parseInt(expiresAt, 10);
+                            expiryText = new Date(ts).toLocaleString();
+                        }
+                        statusEl.textContent = `Logged in — id_token present, expires at ${expiryText}`;
+                        console.log('[OAuth Status] logged in. expires_at=', expiresAt);
+                    } else {
+                        statusEl.textContent = 'Not logged in';
+                        console.log('[OAuth Status] not logged in');
+                    }
+
+                    // If oauthManager exists, log isAuthenticated
+                    if (window.oauthManager && typeof window.oauthManager.isAuthenticated === 'function') {
+                        console.log('[OAuth Status] oauthManager.isAuthenticated() =>', window.oauthManager.isAuthenticated());
+                    }
+                } catch (err) {
+                    console.error('[OAuth Status] error reading status:', err);
+                    if (statusEl) statusEl.textContent = 'Status unknown (see console)';
+                }
+            }
+
+            // Initial status update on page load
+            updateOAuthStatus();
         })();
     </script>
 </body>
