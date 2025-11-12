@@ -79,37 +79,35 @@ class OAuthManager {
             console.log('Token exchange response:', data);
             // Store tokens
             this.accessToken = data.access_token;
-            this.idToken = data.id_token; // This is what we need!
             this.refreshToken = data.refresh_token;
             this.expiresAt = Date.now() + (data.expires_in * 1000);
 
             // Save to sessionStorage
             sessionStorage.setItem('access_token', this.accessToken);
-            sessionStorage.setItem('id_token', this.idToken);
             sessionStorage.setItem('refresh_token', this.refreshToken);
             sessionStorage.setItem('expires_at', this.expiresAt);
 
-            return this.idToken;
+            return this.accessToken;
         } catch (error) {
             console.error('Token exchange error:', error);
             throw error;
         }
     }
 
-    // Get current ID token
-    getIdToken() {
+    // Get current access token
+    getAccessToken() {
         // Check if token exists and not expired
-        if (this.idToken && this.expiresAt > Date.now()) {
-            return this.idToken;
+        if (this.accessToken && this.expiresAt > Date.now()) {
+            return this.accessToken;
         }
 
         // Try to load from sessionStorage
-        const storedToken = sessionStorage.getItem('id_token');
+        const storedToken = sessionStorage.getItem('access_token');
         const storedExpiry = sessionStorage.getItem('expires_at');
 
         if (storedToken && storedExpiry && parseInt(storedExpiry) > Date.now()) {
-            this.idToken = storedToken;
-            return this.idToken;
+            this.accessToken = storedToken;
+            return this.accessToken;
         }
 
         return null;
@@ -153,15 +151,13 @@ class OAuthManager {
             const data = await response.json();
             
             this.accessToken = data.access_token;
-            this.idToken = data.id_token;
             this.expiresAt = Date.now() + (data.expires_in * 1000);
 
             // Update sessionStorage
             sessionStorage.setItem('access_token', this.accessToken);
-            sessionStorage.setItem('id_token', this.idToken);
             sessionStorage.setItem('expires_at', this.expiresAt);
 
-            return this.idToken;
+            return this.accessToken;
         } catch (error) {
             console.error('Token refresh error:', error);
             throw error;
@@ -171,12 +167,10 @@ class OAuthManager {
     // Clear all tokens (logout)
     clearTokens() {
         this.accessToken = null;
-        this.idToken = null;
         this.refreshToken = null;
         this.expiresAt = null;
 
         sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('id_token');
         sessionStorage.removeItem('refresh_token');
         sessionStorage.removeItem('expires_at');
         sessionStorage.removeItem('oauth_state');
@@ -187,7 +181,7 @@ class OAuthManager {
 
     // Check if user is authenticated
     isAuthenticated() {
-        return this.getIdToken() !== null;
+        return this.getAccessToken() !== null;
     }
 }
 

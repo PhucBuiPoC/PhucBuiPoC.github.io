@@ -91,12 +91,12 @@
 
         // Define token callback BEFORE init() call to ensure it's available when init() stores the reference
         function getTokenCallBack() {
-            // Return the id_token produced by the OAuth callback (if present)
+            // Return the access_token produced by the OAuth callback (if present)
             // callback.html stores tokens in sessionStorage when exchange succeeds.
             try {
-                const idToken = sessionStorage.getItem('id_token') || null;
-                console.log('[getTokenCallBack] returning id_token from sessionStorage:', idToken ? 'present' : 'none');
-                return Promise.resolve(idToken);
+                const accessToken = sessionStorage.getItem('access_token') || null;
+                console.log('[getTokenCallBack] returning access_token from sessionStorage:', accessToken ? 'present' : 'none');
+                return Promise.resolve(accessToken);
             } catch (err) {
                 console.error('[getTokenCallBack] error reading sessionStorage:', err);
                 return Promise.resolve(null);
@@ -123,7 +123,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Customer Support Portal v.0.9</h1>
+            <h1>Customer Support Portal v.0.10</h1>
             <p>View and manage your company's support cases</p>
         </div>
 
@@ -269,16 +269,16 @@
             function updateOAuthStatus() {
                 const statusEl = document.getElementById('oauth-status-text');
                 try {
-                    const idToken = sessionStorage.getItem('id_token');
+                    const accessToken = sessionStorage.getItem('access_token');
                     const expiresAt = sessionStorage.getItem('expires_at');
 
-                    if (idToken) {
+                    if (accessToken) {
                         let expiryText = 'unknown';
                         if (expiresAt) {
                             const ts = parseInt(expiresAt, 10);
                             expiryText = new Date(ts).toLocaleString();
                         }
-                        statusEl.textContent = `Logged in — id_token present, expires at ${expiryText}`;
+                        statusEl.textContent = `Logged in — access_token present, expires at ${expiryText}`;
                         console.log('[OAuth Status] logged in. expires_at=', expiresAt);
                     } else {
                         statusEl.textContent = 'Not logged in';
