@@ -123,7 +123,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Customer Support Portal v.1.2</h1>
+            <h1>Customer Support Portal v.1.3</h1>
             <p>View and manage your company's support cases</p>
         </div>
 
@@ -179,14 +179,11 @@
             </p>
 
             <div class="embed-container">
-                <sn-embedx-case-list
-	table="sn_customerservice_case"
-	limit="10"
-	list-title="List of Cases"
-	query="contactDYNAMIC3a3138280f3e10103ff81b41ff767e9f^stateNOT IN6,7,3"
-	view="8791b6df1b5c8958413540c3b24bcbbc"
-	columns="number,sys_updated_on,state,account,short_description">
-</sn-embedx-case-list>
+                <sn-embedx-case-list table="sn_customerservice_case" limit="10" list-title="List of Cases"
+                    query="contactDYNAMIC3a3138280f3e10103ff81b41ff767e9f^stateNOT IN6,7,3"
+                    view="8791b6df1b5c8958413540c3b24bcbbc"
+                    columns="number,sys_updated_on,state,account,short_description">
+                </sn-embedx-case-list>
             </div>
         </div>
 
@@ -388,6 +385,11 @@
                 // This event is dispatched if the record was successfully created.
                 var { table, record_sys_id } = e.detail.payload;
                 console.log(table, record_sys_id);
+                setProperties(snEmbedxCaseView, {
+                    table: table,
+                    sysId: record_sys_id
+                });
+                getEmbeddables(["sn-embedx-case-view", "sn-embedx-case-list"]);
             },
             'SN_EMBEDX_CATALOG_ITEM_FORM#BUTTON_CLICKED': (e) => {
                 // This event is dispatched if any button is clicked on the confirmation message.
@@ -403,8 +405,8 @@
                         table: table,
                         sysId: record_sys_id
                     });
-                    getEmbeddables(["sn-embedx-case-view","sn-embedx-case-list"]);
-                    
+                    getEmbeddables(["sn-embedx-case-view", "sn-embedx-case-list"]);
+
                 }
                 else {
                     // Open the Case View component in the same tab
