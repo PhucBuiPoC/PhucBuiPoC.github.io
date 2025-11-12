@@ -76,7 +76,7 @@ class OAuthManager {
             }
 
             const data = await response.json();
-            
+            console.log('Token exchange response:', data);
             // Store tokens
             this.accessToken = data.access_token;
             this.idToken = data.id_token; // This is what we need!
