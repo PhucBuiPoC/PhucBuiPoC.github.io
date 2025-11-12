@@ -213,7 +213,7 @@
         </div>
     </div>
 
-    <script type="module">
+    <!-- <script type="module">
         import { getEmbeddables } from './index.js';
 
         try {
@@ -222,7 +222,7 @@
         } catch (error) {
             console.error('Component loading failed:', error);
         }
-    </script>
+    </script> -->
     <!-- OAuth test helpers -->
     <script src="oauth-config.js"></script>
     <script>
@@ -332,7 +332,7 @@
     <!-- handler event for list -->
 
     <script type="module">
-        import { getEmbeddables, setEvents, setProperties } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+        import { getEmbeddables, setEvents, setProperties } from './index.js';
 
         const snEmbedxCaseList = document.querySelector('sn-embedx-case-list');
         const snEmbedxCaseView = document.querySelector('sn-embedx-case-view');
