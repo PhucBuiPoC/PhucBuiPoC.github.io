@@ -186,6 +186,31 @@
                 </sn-embedx-case-list>
             </div>
         </div>
+
+        <div class="card">
+            <h2>Log an issue PR</h2>
+            <div class="embed-container">
+                <sn-embedx-catalog-item-form sys-id="c36056db1bd4fd1466216654b24bcb25"
+                    confirmation-text="Request submitted successfully!"
+                    confirmation-sub-text="Estimated resolution in 24 hours" reference-number-label="Reference Number :"
+                    primary-button-label="View details" secondary-button-label="Browse services">
+                </sn-embedx-catalog-item-form>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Ticket view</h2>
+            <div class="embed-container">
+                <sn-embedx-case-view table="sn_customerservice_case"
+                    table-view-for-related-list="8791b6df1b5c8958413540c3b24bcbbc"
+                    header-configuration-id="0a2d92f65333101043d7ddeeff7b12cc"
+                    action-configuration-id="b226535518520210f8775b8843daf9fb" hide-all-related-lists
+                    hide-playbook-process-tab playbook-stage-orientation="horizontal"
+                    visible-horizontal-playbook-stages="5" playbook-activity-view-mode="focused"
+                    sys-id="cc752ed11b18f610827a43f5e34bcbe3">
+                </sn-embedx-case-view>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -303,6 +328,121 @@
             updateOAuthStatus();
         })();
     </script>
+
+    <!-- handler event for list -->
+
+    <script type="module">
+        import { getEmbeddables, setEvents, setProperties } from 'https://sccitsmsit.service-now.com/uxasset/externals/sn_embeddable_core/index.jsdbx';
+
+        const snEmbedxCaseList = document.querySelector('sn-embedx-case-list');
+        const snEmbedxCaseView = document.querySelector('sn-embedx-case-view');
+        const snEmbedxCatalogItemForm = document.querySelector('sn-embedx-catalog-item-form');
+
+        getEmbeddables(["sn-embedx-case-list", "sn-embedx-case-view", "sn-embedx-catalog-item-form"]);
+
+        const eventHandlers = {
+            //sn-embedx-case-list
+            'SN_EMBEDX_CASE_LIST#RECORD_SELECTED': (e) => {
+                // This event is dispatched when a record is selected.
+                var { table, record_sys_id } = e.detail.payload;
+                // the logic to construct the URL for the Case View component. Add your portal URL here.
+                const caseViewURL = '/caseview?emb_table=' + table + '&emb_recordid=' + record_sys_id;
+                // Redirect to the Case View component page
+                open(caseViewURL, '_self');
+            },
+            'SN_EMBEDX_CASE_LIST#COMPONENT_READY': (e) => {
+                // This event is dispatched when a component is ready and usable.
+            },
+            'SN_EMBEDX_CASE_LIST#COMPONENT_ERROR': (e) => {
+                // This event is dispatched when a property validation or internal error occurs.
+                var { errorMessage, errorType } = e.detail.payload;
+                console.log(errorMessage, errorType);
+            },
+
+
+
+            //sn-embedx-catalog-item-form
+            'SN_EMBEDX_CATALOG_ITEM_FORM#COMPONENT_NOTIFICATION_SENT': (e) => {
+                // This event is dispatched when the component provides a notification for the end user.
+                var { items } = e.detail.payload;
+                console.log(items);
+            },
+            'SN_EMBEDX_CATALOG_ITEM_FORM#COMPONENT_ERROR': (e) => {
+                // This event is dispatched when a property validation or internal error occurs.
+                var { errorMessage, errorType } = e.detail.payload;
+                console.log(errorMessage, errorType);
+            },
+            'SN_EMBEDX_CATALOG_ITEM_FORM#RECORD_CREATION_SUCCEEDED': (e) => {
+                // This event is dispatched if the record was successfully created.
+                var { table, record_sys_id } = e.detail.payload;
+                console.log(table, record_sys_id);
+            },
+            'SN_EMBEDX_CATALOG_ITEM_FORM#BUTTON_CLICKED': (e) => {
+                // This event is dispatched if any button is clicked on the confirmation message.
+                var { table, record_sys_id, button_variant } = e.detail.payload;
+                var primaryURL = '/caseview'; // Replace with the URL of the case view page
+                var secondaryURL = '/browse'; // Replace with the URL of the secondary page
+
+                if (button_variant == 'primary') {
+                    // Construct the URL for the Case View component with URL parameters
+                    const caseViewURL = primaryURL + '?emb_table=' + table + '&emb_recordid=' + record_sys_id;
+                    open(caseViewURL, '_self'); // Open case record when primary button is clicked
+                }
+                else {
+                    // Open the Case View component in the same tab
+                    open(secondaryURL, '_self');
+                }
+            },
+            'SN_EMBEDX_CATALOG_ITEM_FORM#RECORD_CREATION_FAILED': (e) => {
+                // This event is dispatched if the record creation has failed.
+            },
+            'SN_EMBEDX_CATALOG_ITEM_FORM#COMPONENT_READY': (e) => {
+                // This event is dispatched when a component is ready and usable.
+            },
+
+            //sn-embedx-case-view
+            /* Uncomment this code for the default behaviour of the Case View component.
+    
+            // Get the record id and table from the current URL for a standard case.
+            // Optionally, get playbook experience ID, playbook context ID, stage context ID,
+            // and activity context ID for playbook case.
+            const currentURL = new URL(window.location.href);
+            const urlParams = new URLSearchParams(currentURL.search);
+            const tableName = urlParams.get('emb_table');
+            const sysRecordId = urlParams.get('emb_recordid');
+            const playbookExperience = urlParams.get('emb_playbook_experience');
+            const playbookContextId = urlParams.get('emb_playbook_context_id');
+            const stageContextId = urlParams.get('emb_stage_context_id');
+            const activityContextId = urlParams.get('emb_activity_context_id');
+        
+            // Update the sysId and table properties of the componentProperties object.
+            // Optionally, update the playbook experience ID, playbook context ID,
+            // stage context ID, and activity context ID for the playbook case view as well.
+            setProperties(snEmbedxCaseView,{
+                table:tableName,
+                sysId:sysRecordId,
+                playbookExperience:playbookExperience,
+                selectedPlaybookContextId:playbookContextId,
+                selectedStageContextId:stageContextId,
+                selectedActivityContextId:activityContextId
+            });
+            */
+            'SN_EMBEDX_CASE_VIEW#COMPONENT_READY': (e) => {
+                // This event is dispatched when a component is ready and usable.
+            },
+            'SN_EMBEDX_CASE_VIEW#COMPONENT_ERROR': (e) => {
+                // This event is dispatched when a property validation or internal error occurs.
+                var { errorMessage, errorType } = e.detail.payload;
+                console.log(errorMessage, errorType);
+            },
+            'SN_EMBEDX_CASE_VIEW#CASE_COMMENT_ADDED': (e) => {
+                // This event is dispatched when a comment is added in the activity stream.
+            }
+        };
+
+        setEvents(snEmbedxCaseList, eventHandlers);
+    </script>
+
 </body>
 
 </html>
