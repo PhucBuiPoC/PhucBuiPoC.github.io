@@ -89,6 +89,18 @@
     <script type="module">
         import { init, login, logout } from './index.js';
 
+        try {
+            await init({
+                theme: '31bf91ae07203010e03948f78ad30095',
+                baseURL: 'https://sccitsmsit.service-now.com',
+                authCallback: getTokenCallBack,
+                module: '8f3596311bc57610f94cffb7d34bcbca',
+            });
+            console.log('Init completed');
+        } catch (error) {
+            console.error('Init failed:', error);
+        }
+
         // Define token callback BEFORE init() call to ensure it's available when init() stores the reference
         function getTokenCallBack() {
             // Return the access_token produced by the OAuth callback (if present)
@@ -103,18 +115,6 @@
             }
         }
 
-        try {
-            await init({
-                theme: '31bf91ae07203010e03948f78ad30095',
-                baseURL: 'https://sccitsmsit.service-now.com',
-                authCallback: getTokenCallBack,
-                module: '8f3596311bc57610f94cffb7d34bcbca',
-            });
-            console.log('Init completed');
-        } catch (error) {
-            console.error('Init failed:', error);
-        }
-
         await login();
         // await logout();
     </script>
@@ -123,7 +123,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Customer Support Portal v.0.10</h1>
+            <h1>Customer Support Portal v.0.11</h1>
             <p>View and manage your company's support cases</p>
         </div>
 
@@ -167,7 +167,9 @@
             </div>
 
             <!-- OAuth status (shows login state for testing) -->
-            <div id="oauth-status" style="margin-top:12px; padding:10px; border-radius:8px; background:#f7fafc; border:1px solid #e2e8f0; color:#2d3748; font-size:14px;">Status: <span id="oauth-status-text">Checking...</span></div>
+            <div id="oauth-status"
+                style="margin-top:12px; padding:10px; border-radius:8px; background:#f7fafc; border:1px solid #e2e8f0; color:#2d3748; font-size:14px;">
+                Status: <span id="oauth-status-text">Checking...</span></div>
         </div>
 
         <div class="card">
