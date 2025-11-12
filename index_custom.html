@@ -349,6 +349,8 @@
             'SN_EMBEDX_CASE_LIST#RECORD_SELECTED': (e) => {
                 // This event is dispatched when a record is selected.
                 var { table, record_sys_id } = e.detail.payload;
+                console.log('SN_EMBEDX_CASE_LIST#RECORD_SELECTED', table);
+                console.log('SN_EMBEDX_CASE_LIST#RECORD_SELECTED', record_sys_id);
                 setProperties(snEmbedxCaseView, {
                     table: table,
                     sysId: record_sys_id
@@ -361,6 +363,7 @@
             },
             'SN_EMBEDX_CASE_LIST#COMPONENT_READY': (e) => {
                 // This event is dispatched when a component is ready and usable.
+                console.log('SN_EMBEDX_CASE_LIST#COMPONENT_READY', e);
             },
             'SN_EMBEDX_CASE_LIST#COMPONENT_ERROR': (e) => {
                 // This event is dispatched when a property validation or internal error occurs.
@@ -384,6 +387,8 @@
             'SN_EMBEDX_CATALOG_ITEM_FORM#RECORD_CREATION_SUCCEEDED': (e) => {
                 // This event is dispatched if the record was successfully created.
                 var { table, record_sys_id } = e.detail.payload;
+                console.log('SN_EMBEDX_CATALOG_ITEM_FORM#RECORD_CREATION_SUCCEEDED', table);
+                console.log('SN_EMBEDX_CATALOG_ITEM_FORM#RECORD_CREATION_SUCCEEDED', record_sys_id);
                 console.log(table, record_sys_id);
                 setProperties(snEmbedxCaseView, {
                     table: table,
@@ -394,6 +399,9 @@
             'SN_EMBEDX_CATALOG_ITEM_FORM#BUTTON_CLICKED': (e) => {
                 // This event is dispatched if any button is clicked on the confirmation message.
                 var { table, record_sys_id, button_variant } = e.detail.payload;
+                console.log('SN_EMBEDX_CATALOG_ITEM_FORM#BUTTON_CLICKED', table);
+                console.log('SN_EMBEDX_CATALOG_ITEM_FORM#BUTTON_CLICKED', record_sys_id);
+                console.log('SN_EMBEDX_CATALOG_ITEM_FORM#BUTTON_CLICKED', button_variant);
                 var primaryURL = '/index_custom'; // Replace with the URL of the case view page
                 var secondaryURL = '/browse'; // Replace with the URL of the secondary page
 
@@ -401,6 +409,7 @@
                     // Construct the URL for the Case View component with URL parameters
                     // const caseViewURL = primaryURL + '?emb_table=' + table + '&emb_recordid=' + record_sys_id;
                     // open(caseViewURL, '_self'); // Open case record when primary button is clicked
+
                     setProperties(snEmbedxCaseView, {
                         table: table,
                         sysId: record_sys_id
@@ -418,6 +427,7 @@
             },
             'SN_EMBEDX_CATALOG_ITEM_FORM#COMPONENT_READY': (e) => {
                 // This event is dispatched when a component is ready and usable.
+                console.log('SN_EMBEDX_CATALOG_ITEM_FORM#COMPONENT_READY', e);
             },
 
             //sn-embedx-case-view
@@ -440,6 +450,7 @@
 
             'SN_EMBEDX_CASE_VIEW#COMPONENT_READY': (e) => {
                 // This event is dispatched when a component is ready and usable.
+                console.log('SN_EMBEDX_CASE_VIEW#COMPONENT_READY', e);
             },
             'SN_EMBEDX_CASE_VIEW#COMPONENT_ERROR': (e) => {
                 // This event is dispatched when a property validation or internal error occurs.
