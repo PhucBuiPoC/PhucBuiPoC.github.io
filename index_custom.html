@@ -337,6 +337,10 @@
         const snEmbedxCaseList = document.querySelector('sn-embedx-case-list');
         const snEmbedxCaseView = document.querySelector('sn-embedx-case-view');
         const snEmbedxCatalogItemForm = document.querySelector('sn-embedx-catalog-item-form');
+        const currentURL = new URL(window.location.href);
+        const urlParams = new URLSearchParams(currentURL.search);
+        const tableName = urlParams.get('emb_table');
+        const sysRecordId = urlParams.get('emb_recordid');
 
         getEmbeddables(["sn-embedx-case-list", "sn-embedx-case-view", "sn-embedx-catalog-item-form"]);
 
@@ -345,10 +349,14 @@
             'SN_EMBEDX_CASE_LIST#RECORD_SELECTED': (e) => {
                 // This event is dispatched when a record is selected.
                 var { table, record_sys_id } = e.detail.payload;
+                setProperties(snEmbedxCaseView, {
+                    table: table,
+                    sysId: record_sys_id
+                });
                 // the logic to construct the URL for the Case View component. Add your portal URL here.
-                const caseViewURL = '/caseview?emb_table=' + table + '&emb_recordid=' + record_sys_id;
+                // const caseViewURL = '/index_custom?emb_table=' + table + '&emb_recordid=' + record_sys_id;
                 // Redirect to the Case View component page
-                open(caseViewURL, '_self');
+                // open(caseViewURL, '_self');
             },
             'SN_EMBEDX_CASE_LIST#COMPONENT_READY': (e) => {
                 // This event is dispatched when a component is ready and usable.
@@ -380,13 +388,17 @@
             'SN_EMBEDX_CATALOG_ITEM_FORM#BUTTON_CLICKED': (e) => {
                 // This event is dispatched if any button is clicked on the confirmation message.
                 var { table, record_sys_id, button_variant } = e.detail.payload;
-                var primaryURL = '/caseview'; // Replace with the URL of the case view page
+                var primaryURL = '/index_custom'; // Replace with the URL of the case view page
                 var secondaryURL = '/browse'; // Replace with the URL of the secondary page
 
                 if (button_variant == 'primary') {
                     // Construct the URL for the Case View component with URL parameters
-                    const caseViewURL = primaryURL + '?emb_table=' + table + '&emb_recordid=' + record_sys_id;
-                    open(caseViewURL, '_self'); // Open case record when primary button is clicked
+                    // const caseViewURL = primaryURL + '?emb_table=' + table + '&emb_recordid=' + record_sys_id;
+                    // open(caseViewURL, '_self'); // Open case record when primary button is clicked
+                    setProperties(snEmbedxCaseView, {
+                        table: table,
+                        sysId: record_sys_id
+                    });
                 }
                 else {
                     // Open the Case View component in the same tab
@@ -406,10 +418,7 @@
             // Get the record id and table from the current URL for a standard case.
             // Optionally, get playbook experience ID, playbook context ID, stage context ID,
             // and activity context ID for playbook case.
-            const currentURL = new URL(window.location.href);
-            const urlParams = new URLSearchParams(currentURL.search);
-            const tableName = urlParams.get('emb_table');
-            const sysRecordId = urlParams.get('emb_recordid');
+            
             const playbookExperience = urlParams.get('emb_playbook_experience');
             const playbookContextId = urlParams.get('emb_playbook_context_id');
             const stageContextId = urlParams.get('emb_stage_context_id');
@@ -418,15 +427,9 @@
             // Update the sysId and table properties of the componentProperties object.
             // Optionally, update the playbook experience ID, playbook context ID,
             // stage context ID, and activity context ID for the playbook case view as well.
-            setProperties(snEmbedxCaseView,{
-                table:tableName,
-                sysId:sysRecordId,
-                playbookExperience:playbookExperience,
-                selectedPlaybookContextId:playbookContextId,
-                selectedStageContextId:stageContextId,
-                selectedActivityContextId:activityContextId
-            });
+            
             */
+
             'SN_EMBEDX_CASE_VIEW#COMPONENT_READY': (e) => {
                 // This event is dispatched when a component is ready and usable.
             },
